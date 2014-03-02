@@ -26,7 +26,9 @@ public class SketchUnit extends BaseUnit {
 	}
 	
 	public void setPointList(List<Point> points){
-		pList = points;
+		synchronized(pList) {
+			pList = points;
+		}
 	}
 	
 	public List<Point> getPoints() {

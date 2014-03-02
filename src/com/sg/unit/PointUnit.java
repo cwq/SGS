@@ -3,7 +3,9 @@ package com.sg.unit;
 import android.graphics.Canvas;
 
 import com.sg.constraint.ConstraintHandler;
+import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
+import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
 public class PointUnit extends BaseUnit {
@@ -48,6 +50,10 @@ public class PointUnit extends BaseUnit {
 		if (ConstraintHandler.IsInUcKeys(this))
 			ConstraintHandler.Changed(this);
 	}
+	
+	public Point getPoint() {
+		return new Point(X, Y);
+	}
 
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
@@ -59,7 +65,12 @@ public class PointUnit extends BaseUnit {
 	@Override
 	public boolean isInUnit(Point point) {
 		// TODO Auto-generated method stub
-		return false;
+		double curDistance = CommonFunction.distance(new Point(X, Y), point);
+		if(curDistance < ThresholdProperty.GRAPH_CHECKED_DISTANCE){
+			return true;
+		}else{
+			return false;
+		}
 	}
 
 	@Override

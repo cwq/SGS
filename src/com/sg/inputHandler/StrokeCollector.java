@@ -68,7 +68,7 @@ public class StrokeCollector {
 				if (event.getPointerCount() > 1){
 					//多点为手势
 					points2.add(new Point(event.getX(1), event.getY(1)));
-					ins.recognize(new Point(event.getX(0), event.getY(0)), new Point(event.getX(1), event.getY(1)));
+					ins.recognize(movePoint, new Point(event.getX(1), event.getY(1)));
 					state = 1;
 
 					Log.v("sc", "state0 : 多点为手势");
@@ -79,7 +79,7 @@ public class StrokeCollector {
 						UnitController.getInstance().getSelectUnit().isInUnit(points1.get(0))) {
 					Log.v("sc", "state0 : 当前有图元选中  识别手势");
 					//如果当前有图元选中  并且起 始点中选择的图元  识别手势
-					ins.recognize(new Point(event.getX(0), event.getY(0)));
+					ins.recognize(movePoint);
 					state = 1;
 					break;
 				}
@@ -95,6 +95,7 @@ public class StrokeCollector {
 					} else {
 						Log.v("sc", "state0 : 图元识别");
 						state = 2;
+						UnitRecognizer.getInstance().recognizeFirstPart(points1);
 						break;
 					}
 				}
@@ -104,14 +105,15 @@ public class StrokeCollector {
 				if (event.getPointerCount() > 1){
 					Log.v("sc", "state1 : 多点为手势");
 					points2.add(new Point(event.getX(1), event.getY(1)));
-					ins.recognize(new Point(event.getX(0), event.getY(0)), new Point(event.getX(1), event.getY(1)));
+					ins.recognize(movePoint, new Point(event.getX(1), event.getY(1)));
 				} else {
 					Log.v("sc", "state1 : 单点手势");
-					ins.recognize(new Point(event.getX(0), event.getY(0)));
+					ins.recognize(movePoint);
 				}
 				break;
 			case 2: //图元识别
-				drawingSketch.setPointList(UnitRecognizer.getInstance().recognizeUnitOnMove(points1));
+				UnitRecognizer.getInstance().recognizeUnitOnMove(movePoint);
+				//drawingSketch.setPointList(UnitRecognizer.getInstance().recognizeUnitOnMove(movePoint));
 				Log.v("sc", "state2 : 图元识别");
 				break;
 			default:
@@ -124,7 +126,7 @@ public class StrokeCollector {
 			BaseUnit curUnit;
 			//图元识别
 			if (state == 0 || state == 2) {
-				curUnit = UnitRecognizer.getInstance().recognizeUnitOnUp(points1);
+				curUnit = UnitRecognizer.getInstance().recognizeUnitOnUp(points1, state);
 				Log.v("sc", "up 图元识别");
 			} else {
 				curUnit = UnitController.getInstance().getSelectUnit();
@@ -132,7 +134,8 @@ public class StrokeCollector {
 			//识别是否删除（采用android型 拖动删除）
 			points1.clear();
 			points2.clear();
-			drawingSketch.setPointList(new ArrayList<Point>());
+			drawingSketch.clear();
+//			drawingSketch.setPointList(new ArrayList<Point>());
 			state = 0;
 			//if 弹起来 {
 			ConstraintHandler.constraintRecognize(curUnit);

@@ -68,6 +68,10 @@ public class Point {
 		return total;
 	}
 	
+	public void setTotal(int t) {
+		total = t;
+	}
+	
 	/*
 	 * 增指定值
 	 * */

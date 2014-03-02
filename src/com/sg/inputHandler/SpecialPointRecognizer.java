@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
+import com.sg.property.common.ThresholdProperty;
 
 /**
  * 点处理
@@ -188,12 +189,14 @@ public class SpecialPointRecognizer {
 			for(int i = 1; i < n-1; i++) {
 				if( pList.get(i).getTotal() >= 3 ) {      //去除起始点附近的噪点
 					for(int j = i-1; j >= 0; j--) {
-						if(pList.get(j).getTotal() >= 3 && CommonFunction.distance(pList.get(i),pList.get(j)) <= 50.0) {
+						if(pList.get(j).getTotal() >= 3 && 
+								CommonFunction.distance(pList.get(i),pList.get(j)) <= ThresholdProperty.TWO_POINT_IS_CLOSED) {
 							pList.get(i).increaseTotal(-1);
 						}
 					}
 				}
-				if((pList.get(i).getTotal() >= 3)&&(CommonFunction.distance(pList.get(i),pList.get(n -1))<50.0)){          //处理末尾附近点的冗余
+				if((pList.get(i).getTotal() >= 3)&&
+						(CommonFunction.distance(pList.get(i),pList.get(n -1))<ThresholdProperty.TWO_POINT_IS_CLOSED)){          //处理末尾附近点的冗余
 				pList.get(i).increaseTotal(-1);
 			}
 				pList.get(i).increaseTotal(1);
@@ -209,6 +212,7 @@ public class SpecialPointRecognizer {
 	 * @return
 	 */
 	public List<Integer> getSpecialPointIndex(List<Point> pList) {
+		//gaussProcessing(pList);
 		speed(pList);
 		direction(pList);
 		curvity(pList);
@@ -220,6 +224,7 @@ public class SpecialPointRecognizer {
 			if(pList.get(i).getTotal() >= 4) {    //特征值大于等于4的点为特征点
 				specialPointIndexs.add(i);
 			}
+			pList.get(i).setTotal(0);
 		}
 		
 		return specialPointIndexs;

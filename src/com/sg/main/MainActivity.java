@@ -126,10 +126,10 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
     	if(keyCode == KeyEvent.KEYCODE_MENU) {
-    		if (mHorizontalScrollView.getVisibility() == ViewGroup.GONE) {
+    		if (mHorizontalScrollView.getVisibility() == ViewGroup.INVISIBLE) {
     			mHorizontalScrollView.setVisibility(ViewGroup.VISIBLE);
 			} else {
-				mHorizontalScrollView.setVisibility(ViewGroup.GONE);
+				mHorizontalScrollView.setVisibility(ViewGroup.INVISIBLE);
 			}
     		
     		return true;

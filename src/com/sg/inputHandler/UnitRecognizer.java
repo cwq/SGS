@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.net.NetworkInfo.State;
+import android.util.Log;
 
 import com.sg.controller.UnitController;
 import com.sg.property.common.CommonFunction;
@@ -37,17 +38,22 @@ public class UnitRecognizer {
 	
 	private boolean isLine(List<Point> points) {
 		int n = points.size();
-		
+		if (n < 2) {
+			return false;
+		}
         //判断是否是直线图元的方法：若首末两点的距离比上所有的两两相邻的点之间的距离之和，比之大于阀值的话，则判断为直线图元
         //阀值暂定为0.95
 		double totalLength = 0.0;
 		double tmpLength = CommonFunction.distance(points.get(0), points.get(n-1));
 		
+		if (tmpLength < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
+			return false;
+		}
 		for(int i = 0; i < n-1; i++) {
 			totalLength += CommonFunction.distance(points.get(i), points.get(i+1));
 		}
 		
-		if(tmpLength / totalLength >= 0.95) {
+		if(tmpLength / totalLength >= 0.98) {
 			return true;
 		}
 		
@@ -59,7 +65,7 @@ public class UnitRecognizer {
 	 * @param points
 	 */
 	public void recognizeFirstPart(List<Point> points) {
-		SpecialPointRecognizer.getInstance().gaussProcessing(points);
+//		SpecialPointRecognizer.getInstance().gaussProcessing(points);
 		List<Integer> ins = SpecialPointRecognizer.getInstance().getSpecialPointIndex(points);
 		if (ins.size() > 2) {
 			//折线
@@ -68,7 +74,7 @@ public class UnitRecognizer {
 				UnitController.getInstance().addUnit(lastUnit);
 			}
 		} else {
-			if (isLine(points)) {
+			if (isLine(points) && ins.size() == 2) {
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
 				UnitController.getInstance().addUnit(lastUnit);
 			} else {
@@ -104,12 +110,21 @@ public class UnitRecognizer {
 	
 	public BaseUnit recognizeUnitOnUp(List<Point> points, int state) {
 		UnitController.getInstance().setSelectUnit(null);
+		int n = points.size();
+		double totalLength = 0;
+		for(int i = 0; i < n-1; i++) {
+			totalLength += CommonFunction.distance(points.get(i), points.get(i+1));
+		}
+		if (totalLength < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
+			return null;
+		}
 		if (state == 0) {
 			recognizeFirstPart(points);
 		}
 		if (lastUnit instanceof CurveUnit) {
+			
 			SketchUnit sketchUnit =  new SketchUnit();
-			for (int i = 0; i < points.size(); i++) {
+			for (int i = 0; i < n; i++) {
 				sketchUnit.addPoint(points.get(i));
 			}
 			UnitController.getInstance().addUnit(sketchUnit);

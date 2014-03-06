@@ -57,22 +57,23 @@ public class SpecialPointRecognizer {
 	 * 速度过滤方法：低于平均值的一定百分比算是特征点
 	 * @param pList
 	 */
-	public void speed(List<Point> pList) {
+	private void speed(List<Point> pList, int[] total) {
 		int n = pList.size();
-		pList.get(0).setSpeed(0.0); // 第一点和最后一点速度置为0.0
-		pList.get(n - 1).setSpeed(0.0);
+		double[] speed = new double[n];
+		speed[0] = 0;   // 第一点和最后一点速度置为0.0
+		speed[n-1] = 0;
 
 		double average = 0.0;
 		for (int i = 1; i < n - 1; i++) {
 			double tempSpeed = CommonFunction.distance(pList.get(i), pList.get(i - 1))
 					+ CommonFunction.distance(pList.get(i + 1), pList.get(i));
-			pList.get(i).setSpeed(tempSpeed);
+			speed[i] = tempSpeed;
 			average += tempSpeed;
 		}
 		average /= n;
 		for (int i = 0; i < n; i++) {
-			if (pList.get(i).getSpeed() < average * 0.42) {
-				pList.get(i).increaseTotal(1);
+			if (speed[i] < average * 0.42) {
+				total[i] += 1;;
 			}
 		}
 		
@@ -82,9 +83,11 @@ public class SpecialPointRecognizer {
 	 * 方向过滤方法 对于点i；边<i-1,i>和边<i,i+1>之间的夹角来判断是否平滑过渡 夹角大于175度时，平滑过渡，否则，点i为一个转折点
 	 * 运用余弦定理求解角度
 	 * @param pList
+	 * @param total 
 	 */
-	public void direction(List<Point> pList) {
+	private void direction(List<Point> pList, int[] total) {
 		int n = pList.size();
+		double[] direction = new double[n];
 		for (int i = 1; i < n - 1; i++) { // 余弦定理
 			double A = CommonFunction.distance(pList.get(i - 1), pList.get(i + 1));
 			double B = CommonFunction.distance(pList.get(i), pList.get(i + 1));
@@ -93,17 +96,17 @@ public class SpecialPointRecognizer {
 			double tmp = B * B + C * C - A * A;
 			tmp = tmp / (2 * B * C + 0.00001);
 			double ridian = Math.acos(tmp);
-			pList.get(i).setDirection(ridian * 180.0 / Math.PI);
+			direction[i] = (ridian * 180.0 / Math.PI);
 		}
 
 
 		for (int i = 1; i < n - 1; i++) {
-			if (pList.get(i).getDirection() <= 170.0) {
-                pList.get(i).increaseTotal(1);
+			if (direction[i] <= 170.0) {
+                total[i] += 1;
 				}
 		}
-		pList.get(0).increaseTotal(1);
-		pList.get(n-1).increaseTotal(1);
+		total[0] += 1;
+		total[n-1] += 1;
 		
 	}
 	
@@ -117,8 +120,9 @@ public class SpecialPointRecognizer {
      * 所以只需枚举[0,180)，计算所有-xsinA+ycosA的和，就是切线与x轴夹角
      * 求出夹角后，求曲率：
      * double rate = System.Math.Sin(30*pi/180.0);
+	 * @param total 
 	 * */
-	public void curvity(List<Point> pList) {
+	private void curvity(List<Point> pList, int[] total) {
 		int n = pList.size();
 		double[] sita = new double[n];
 
@@ -146,63 +150,65 @@ public class SpecialPointRecognizer {
 			}
 		}
 		
+		double[] curvity = new double[n];
 		for(int i = 2; i < n-2; i++) {
 			double tmp = 0.0;
 			for(int k = 1; k < 4; k++) {
 				tmp += Math.abs(sita[i - 2 + k] - sita[i - 3 + k]);
 			}
 			
-			pList.get(i).setCurvity(tmp / CommonFunction.distance(pList.get(i-2), pList.get(i+2)));
+			curvity[i] = (tmp / CommonFunction.distance(pList.get(i-2), pList.get(i+2)));
 			
-			if(Math.abs(pList.get(i).getCurvity()) > 100) {    //处理可能为异常抖动的点
-				pList.get(i).setCurvity(0.0);
-				pList.get(i).increaseTotal(-1);
-				if(pList.get(i).getTotal() >= 2) {
-					pList.get(i).increaseTotal(1);
+			if(Math.abs(curvity[i]) > 100) {    //处理可能为异常抖动的点
+				curvity[i] = 0;
+				total[i] -= 1;
+				if(total[i] >= 2) {
+					total[i] += 1;
 				}
 			}
 		}
 		
 		double average = 0.0;
 		for(int i = 0; i < n; i++) {
-			average += pList.get(i).getCurvity();
+			average += curvity[i];
 		}
 		average /= n;
 		
 		for(int i = 1; i < n-1; i++) {
-			if(pList.get(i).getCurvity() > average * 1.0) {
-				pList.get(i).increaseTotal(1);
-			} else if(pList.get(i).getTotal() >= 2) {
-				pList.get(i).increaseTotal(1);
+			if(curvity[i] > average * 1.0) {
+				total[i] += 1;
+			} else if(total[i] >= 2) {
+				total[i] += 1;
 			}
 		}
-		pList.get(0).increaseTotal(1);
-		pList.get(n-1).increaseTotal(1);
+		total[0] += 1;
+		total[n-1] += 1;
 	}
 	
 	/**
 	 * 对系列电进一步处理
+	 * @param total 
 	 * */
-	public void space(List<Point> pList) {
+	private void space(List<Point> pList, int[] total) {
 		int n = pList.size();
 		
 			for(int i = 1; i < n-1; i++) {
-				if( pList.get(i).getTotal() >= 3 ) {      //去除起始点附近的噪点
+				if( total[i] >= 3 ) {      //去除起始点附近的噪点
 					for(int j = i-1; j >= 0; j--) {
-						if(pList.get(j).getTotal() >= 3 && 
+						if(total[j] >= 3 && 
 								CommonFunction.distance(pList.get(i),pList.get(j)) <= ThresholdProperty.TWO_POINT_IS_CLOSED) {
-							pList.get(i).increaseTotal(-1);
+							total[i] -= 1;
 						}
 					}
 				}
-				if((pList.get(i).getTotal() >= 3)&&
+				if((total[i] >= 3)&&
 						(CommonFunction.distance(pList.get(i),pList.get(n -1))<ThresholdProperty.TWO_POINT_IS_CLOSED)){          //处理末尾附近点的冗余
-				pList.get(i).increaseTotal(-1);
+					total[i] -= 1;
 			}
-				pList.get(i).increaseTotal(1);
+				total[i] += 1;
 			}
-			pList.get(0).increaseTotal(1);
-			pList.get(n-1).increaseTotal(1);
+			total[0] += 1;
+			total[n-1] += 1;
 			
 	}
 	
@@ -213,18 +219,18 @@ public class SpecialPointRecognizer {
 	 */
 	public List<Integer> getSpecialPointIndex(List<Point> pList) {
 		//gaussProcessing(pList);
-		speed(pList);
-		direction(pList);
-		curvity(pList);
-		space(pList);
+		int[] total = new int[pList.size()];
+		speed(pList, total);
+		direction(pList, total);
+		curvity(pList, total);
+		space(pList, total);
 		
 		List<Integer> specialPointIndexs = new ArrayList<Integer>();
 		int n = pList.size();
 		for(int i=0; i < n; i++) {
-			if(pList.get(i).getTotal() >= 4) {    //特征值大于等于4的点为特征点
+			if(total[i] >= 4) {    //特征值大于等于4的点为特征点
 				specialPointIndexs.add(i);
 			}
-			pList.get(i).setTotal(0);
 		}
 		
 		return specialPointIndexs;

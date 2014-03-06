@@ -2,6 +2,8 @@ package com.sg.unit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
+
 import android.graphics.Canvas;
 
 import com.sg.property.common.CommonFunction;
@@ -14,7 +16,7 @@ public class SketchUnit extends BaseUnit {
 	private List<Point> pList;
 	
 	public SketchUnit() {
-		pList = new ArrayList<Point>();
+		pList = new Vector<Point>();
 	}
 	
 	public SketchUnit(List<Point> points) {
@@ -26,9 +28,9 @@ public class SketchUnit extends BaseUnit {
 	}
 	
 	public void setPointList(List<Point> points){
-		synchronized(pList) {
+//		synchronized(pList) {
 			pList = points;
-		}
+//		}
 	}
 	
 	public List<Point> getPoints() {
@@ -36,9 +38,9 @@ public class SketchUnit extends BaseUnit {
 	}
 	
 	public void clear() {
-		synchronized(pList) {
+//		synchronized(pList) {
 			pList.clear();
-		}
+//		}
 	}
 
 	@Override
@@ -48,10 +50,10 @@ public class SketchUnit extends BaseUnit {
 			return;
 		int n = pList.size();
 		for(int i = 0; i < n-1; i++) {
-			synchronized(pList) {
+//			synchronized(pList) {
 				if(pList.size()-1 > i)
 					canvas.drawLine(pList.get(i).getX(), pList.get(i).getY(), pList.get(i+1).getX(), pList.get(i+1).getY(), painter.getPaint());
-			}
+//			}
 			
 		}
 	}

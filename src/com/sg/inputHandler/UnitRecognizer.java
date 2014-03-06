@@ -26,6 +26,10 @@ public class UnitRecognizer {
 	private static UnitRecognizer instance = new UnitRecognizer();
 	
 	private BaseUnit lastUnit;
+	private boolean isAdjust = false;
+	private Point startAdjustPoint;
+	private Point endAdjustPoint;
+	private double minDis;
 
 	private UnitRecognizer() {
 		
@@ -96,6 +100,33 @@ public class UnitRecognizer {
 			double tmp = B * B + C * C - A * A;
 			tmp = tmp / (2 * B * C + 0.00001);
 			double ridian = Math.acos(tmp);
+			
+			if (isAdjust) {
+				((LineUnit) lastUnit).setEnd2(new PointUnit(p));
+				if (B < minDis) {
+					minDis = B;
+					endAdjustPoint = p;
+				}
+				if (CommonFunction.distance(startAdjustPoint, p) > ThresholdProperty.GRAPH_CHECKED_DISTANCE) {
+					//退出微调
+					Log.v("Adjust", "退出微调");
+					isAdjust = false;
+					((LineUnit) lastUnit).setEnd2(new PointUnit(endAdjustPoint));
+				}
+				return;
+			}
+			
+			if (!isAdjust && B < ThresholdProperty.POINT_DISTANCE) {
+				//进入微调
+				Log.v("Adjust", "进入微调");
+				isAdjust = true;
+				startAdjustPoint = p;
+				endAdjustPoint = p;
+				minDis = B;
+				((LineUnit) lastUnit).setEnd2(new PointUnit(p));
+				return;
+			}
+			
 			if (ridian * 180.0 / Math.PI <= 150.0 && disL > ThresholdProperty.TWO_POINT_IS_CLOSED) {
 				
 				lastUnit = new LineUnit(temp.getEnd2().getPoint(), p);
@@ -109,6 +140,7 @@ public class UnitRecognizer {
 	}
 	
 	public BaseUnit recognizeUnitOnUp(List<Point> points, int state) {
+		isAdjust = false;
 		UnitController.getInstance().setSelectUnit(null);
 		int n = points.size();
 		double totalLength = 0;

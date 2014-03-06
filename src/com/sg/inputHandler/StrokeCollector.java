@@ -3,6 +3,7 @@ package com.sg.inputHandler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Vector;
 
 import com.sg.constraint.BaseConstraint;
 import com.sg.constraint.ConstraintHandler;
@@ -30,7 +31,7 @@ public class StrokeCollector {
 	private int state;
 	
 	public StrokeCollector() {
-		points1 = new ArrayList<Point>();
+		points1 = new Vector<Point>();
 		points2 = new ArrayList<Point>();
 		drawingSketch = UnitController.getInstance().getSketchUnit();
 	}

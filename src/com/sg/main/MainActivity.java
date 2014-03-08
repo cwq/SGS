@@ -1,7 +1,6 @@
 package com.sg.main;
 
 import com.sg.controller.UnitController;
-import com.sg.property.R;
 import com.sg.property.common.ThresholdProperty;
 
 import android.app.Activity;

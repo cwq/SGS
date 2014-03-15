@@ -1,7 +1,10 @@
 package com.sg.inputHandler;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import android.util.Log;
 
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
@@ -115,7 +118,7 @@ public class SpecialPointRecognizer {
      * 二：将五个点绕原点旋转[0,180)，记录五个点|y|的绝对值的和
      * 三：使得绝对值和最小的角度为i点切线与x轴的夹角
      * 旋转矩阵：cosA   -sinA
-     *                              sinA    cosA
+     *        sinA    cosA
      * 原来坐标(x,y),旋转后(xcosA+ysinA,-xsinA+ycosA);
      * 所以只需枚举[0,180)，计算所有-xsinA+ycosA的和，就是切线与x轴夹角
      * 求出夹角后，求曲率：
@@ -149,7 +152,7 @@ public class SpecialPointRecognizer {
 				}
 			}
 		}
-		
+		Log.v("time121", new Date().getTime()+"");
 		double[] curvity = new double[n];
 		for(int i = 2; i < n-2; i++) {
 			double tmp = 0.0;
@@ -221,10 +224,13 @@ public class SpecialPointRecognizer {
 		//gaussProcessing(pList);
 		int[] total = new int[pList.size()];
 		speed(pList, total);
+		Log.v("time11", new Date().getTime()+"");
 		direction(pList, total);
+		Log.v("time12", new Date().getTime()+"");
 		curvity(pList, total);
+		Log.v("time13", new Date().getTime()+"");
 		space(pList, total);
-		
+		Log.v("time14", new Date().getTime()+"");
 		List<Integer> specialPointIndexs = new ArrayList<Integer>();
 		int n = pList.size();
 		for(int i=0; i < n; i++) {

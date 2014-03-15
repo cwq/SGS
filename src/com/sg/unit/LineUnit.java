@@ -60,7 +60,7 @@ public class LineUnit extends BaseUnit {
 		
 	}
 	@Override
-	public void rotate(Point vector) {
+	public void rotate(double rotateAngle) {
 		// TODO Auto-generated method stub
 		
 	}	

@@ -31,5 +31,5 @@ public abstract class BaseUnit {
 	 * @param vector
 	 * x = sinQ, y = cosQ
 	 */
-	public abstract void rotate(Point vector);
+	public abstract void rotate(double rotateAngle);
 }

@@ -71,25 +71,35 @@ public class UnitRecognizer {
 	public void recognizeFirstPart(List<Point> points) {
 //		SpecialPointRecognizer.getInstance().gaussProcessing(points);
 		List<Integer> ins = SpecialPointRecognizer.getInstance().getSpecialPointIndex(points);
+		if (ins.size() < 2)  return;
+		if (ins.size() == 2) {
+			if (isLine(points)) {
+				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
+				UnitController.getInstance().addUnit(lastUnit);
+			} else {
+				lastUnit = new CurveUnit();
+				if(((CurveUnit)lastUnit).Adapt(points) == true) {
+					UnitController.getInstance().addUnit(lastUnit);
+				} else {
+					//草图
+					lastUnit =  null;
+					return;
+				}
+			}
+		}
 		if (ins.size() > 2) {
 			//折线
 			for (int i = 0; i < ins.size() - 1; i++) {
 				lastUnit = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
 				UnitController.getInstance().addUnit(lastUnit);
 			}
-		} else {
-			if (isLine(points) && ins.size() == 2) {
-				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
-				UnitController.getInstance().addUnit(lastUnit);
-			} else {
-				lastUnit = new CurveUnit();
-			}
-		}
+		} 
 		
 	}
 	
 	//onMove  还在移动中
 	public void recognizeUnitOnMove(Point p) {
+		if (lastUnit == null)  return;
 		if (lastUnit instanceof LineUnit) {
 			LineUnit temp = (LineUnit) lastUnit;
 			double A = CommonFunction.distance(temp.getEnd1().getPoint(), p);
@@ -134,8 +144,13 @@ public class UnitRecognizer {
 			} else {
 				((LineUnit) lastUnit).setEnd2(new PointUnit(p));
 			}
-		} else {
-
+		}
+		if (lastUnit instanceof CurveUnit) {
+			CurveUnit temp = (CurveUnit) lastUnit;
+			if (temp.Adapt(UnitController.getInstance().getSketchUnit().getPoints()) == false) {
+				UnitController.getInstance().deleteUnit(lastUnit);
+				lastUnit = null;
+			}
 		}
 	}
 	
@@ -147,14 +162,16 @@ public class UnitRecognizer {
 		for(int i = 0; i < n-1; i++) {
 			totalLength += CommonFunction.distance(points.get(i), points.get(i+1));
 		}
+		//画的距离太短 忽略
 		if (totalLength < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
 			return null;
 		}
+		//时间很短
 		if (state == 0) {
 			recognizeFirstPart(points);
 		}
-		if (lastUnit instanceof CurveUnit) {
-			
+		//草图
+		if (lastUnit == null) {
 			SketchUnit sketchUnit =  new SketchUnit();
 			for (int i = 0; i < n; i++) {
 				sketchUnit.addPoint(points.get(i));
@@ -162,15 +179,7 @@ public class UnitRecognizer {
 			UnitController.getInstance().addUnit(sketchUnit);
 			lastUnit = sketchUnit;
 		}
-//		SpecialPointRecognizer specialPointRecognizer = SpecialPointRecognizer.getInstance();
-//		//specialPointRecognizer.gaussProcessing(points);
-//		List<Integer> ins = specialPointRecognizer.getSpecialPointIndex(points);
-//		SketchUnit sketchUnit =  new SketchUnit();
-//		for (int i = 0; i < ins.size(); i++) {
-//			sketchUnit.addPoint(points.get(ins.get(i)));
-//		}
-//		UnitController.getInstance().addUnit(sketchUnit);
-//		return sketchUnit;
+
 		return lastUnit;
 	}
 	

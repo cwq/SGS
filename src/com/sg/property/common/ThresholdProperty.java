@@ -43,6 +43,8 @@ public class ThresholdProperty {
 	//RadioButton layout_width
 	public static int BUTTON_WIDTH;
 	
+	public static double FLOAT_OFFSET = 1e-10;
+	
 	public static void set(float density, int width) {
 		POINT_COUNT = 20;
 		POINT_DISTANCE = 8 * density;

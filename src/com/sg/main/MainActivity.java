@@ -149,6 +149,7 @@ public class MainActivity extends Activity implements OnCheckedChangeListener{
     	builder.setPositiveButton("确定", new DialogInterface.OnClickListener(){
     		public void onClick(DialogInterface dialog, int whichButton) {
     			//mainView.clear();
+    			UnitController.getInstance().clear();
     			//closeBluetooth();
        		    finish();
     		}

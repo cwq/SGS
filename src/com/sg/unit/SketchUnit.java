@@ -3,6 +3,7 @@ package com.sg.unit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.locks.Lock;
 
 import android.graphics.Canvas;
 
@@ -46,15 +47,14 @@ public class SketchUnit extends BaseUnit {
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
 		// TODO Auto-generated method stub
-		if(pList == null)
-			return;
-		int n = pList.size();
-		for(int i = 0; i < n-1; i++) {
-//			synchronized(pList) {
+		synchronized(pList) {
+			if(pList == null)
+				return;
+			int n = pList.size();
+			for(int i = 0; i < n-1; i++) {
 				if(pList.size()-1 > i)
-					canvas.drawLine(pList.get(i).getX(), pList.get(i).getY(), pList.get(i+1).getX(), pList.get(i+1).getY(), painter.getPaint());
-//			}
-			
+					canvas.drawLine(pList.get(i).getX(), pList.get(i).getY(), pList.get(i+1).getX(), pList.get(i+1).getY(), painter.getPaint());			
+			}
 		}
 	}
 
@@ -84,7 +84,7 @@ public class SketchUnit extends BaseUnit {
 	}
 
 	@Override
-	public void rotate(Point vector) {
+	public void rotate(double rotateAngle) {
 		// TODO Auto-generated method stub
 		
 	}

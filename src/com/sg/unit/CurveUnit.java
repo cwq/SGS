@@ -1,18 +1,288 @@
 package com.sg.unit;
 
-import android.graphics.Canvas;
+import java.util.List;
 
+import android.graphics.Canvas;
+import android.graphics.Path;
+
+import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
+import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
 public class CurveUnit extends BaseUnit {
+	
+    public double a;
+    public double b;
+    public Point center;
+    public double startAngle;
+    public double sweepAngle;
+    public double rotateAngle;
 
+    private Point[] ctlPoint;   //贝塞尔曲线控制点
+    
+    public CurveUnit() {
+        this(new Point(0, 0), 0, 0, 0, 0, 0);
+    }
+
+    public CurveUnit(Point c, double a, double b, double startAngle, double sweepAngle, double rotateAngle)
+    {
+        center = c;
+        this.a = a;
+        this.b = b;
+        this.startAngle = startAngle;
+        this.sweepAngle = sweepAngle;
+        this.rotateAngle = rotateAngle;
+    }    
+    
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
 		// TODO Auto-generated method stub
+		if(Math.abs(sweepAngle - 0) < ThresholdProperty.FLOAT_OFFSET) return;
 		
+		CtlPointUpdate();
+		Path path = new Path();
+		path.moveTo(ctlPoint[0].getX(),ctlPoint[0].getY());
+		for(int i=1; i<ctlPoint.length; i=i+3) {
+			path.cubicTo(ctlPoint[i].getX(), ctlPoint[i].getY(), 
+					ctlPoint[i+1].getX(), ctlPoint[i+1].getY(), ctlPoint[i+2].getX(), ctlPoint[i+2].getY());
+		}
+		canvas.drawPath(path, painter.getPaint());
 	}
 
+    // 更新控制点
+    private void CtlPointUpdate() {
+        while (this.startAngle > 2 * Math.PI) this.startAngle -= 2 * Math.PI;
+        while (this.startAngle < -2 * Math.PI) this.startAngle += 2 * Math.PI;
+        while (this.rotateAngle > 2 * Math.PI) this.rotateAngle -= 2 * Math.PI;
+        while (this.rotateAngle < -2 * Math.PI) this.rotateAngle += 2 * Math.PI;
+        if (this.sweepAngle > 2 * Math.PI) this.sweepAngle = 2 * Math.PI;
+        if (this.sweepAngle < -2 * Math.PI) this.sweepAngle = -2 * Math.PI;
+
+        double sweepAngle = this.sweepAngle;
+        if (sweepAngle < 0)
+        {
+            sweepAngle = Math.atan2(Math.sin(sweepAngle) * a, Math.cos(sweepAngle) * b);
+            if (sweepAngle >= 0) sweepAngle -= 2 * Math.PI;
+        }
+        else
+        {
+            sweepAngle = Math.atan2(Math.sin(sweepAngle) * a, Math.cos(sweepAngle) * b);
+            if (sweepAngle <= 0) sweepAngle += 2 * Math.PI;
+        }
+
+        if (sweepAngle > Math.PI * 3 / 2)
+        {
+            ctlPoint = new Point[13];
+            ArcToBezier(startAngle, Math.PI / 2, 0);
+            ArcToBezier(startAngle + Math.PI / 2, Math.PI / 2, 3);
+            ArcToBezier(startAngle + Math.PI, Math.PI / 2, 6);
+            ArcToBezier(startAngle + Math.PI * 3 / 2, sweepAngle - Math.PI * 3 / 2, 9);
+        }
+        else if (sweepAngle > Math.PI)
+        {
+            ctlPoint = new Point[10];
+            ArcToBezier(startAngle, Math.PI / 2, 0);
+            ArcToBezier(startAngle + Math.PI / 2, Math.PI / 2, 3);
+            ArcToBezier(startAngle + Math.PI, sweepAngle - Math.PI, 6);
+        }
+        else if (sweepAngle > Math.PI / 2)
+        {
+            ctlPoint = new Point[7];
+            ArcToBezier(startAngle, Math.PI / 2, 0);
+            ArcToBezier(startAngle + Math.PI / 2, sweepAngle - Math.PI / 2, 3);
+        }
+        else if (sweepAngle >= -Math.PI / 2)
+        {
+            ctlPoint = new Point[4];
+            ArcToBezier(startAngle, sweepAngle, 0);
+        }
+        else if (sweepAngle < -Math.PI * 3 / 2)
+        {
+            ctlPoint = new Point[13];
+            ArcToBezier(startAngle, -Math.PI / 2, 0);
+            ArcToBezier(startAngle - Math.PI / 2, -Math.PI / 2, 3);
+            ArcToBezier(startAngle - Math.PI, -Math.PI / 2, 6);
+            ArcToBezier(startAngle - Math.PI * 3 / 2, sweepAngle + Math.PI * 3 / 2, 9);
+        }
+        else if (sweepAngle < -Math.PI)
+        {
+            ctlPoint = new Point[10];
+            ArcToBezier(startAngle, -Math.PI / 2, 0);
+            ArcToBezier(startAngle - Math.PI / 2, -Math.PI / 2, 3);
+            ArcToBezier(startAngle - Math.PI, sweepAngle + Math.PI, 6);
+        }
+        else
+        {
+            ctlPoint = new Point[7];
+            ArcToBezier(startAngle, -Math.PI / 2, 0);
+            ArcToBezier(startAngle - Math.PI / 2, sweepAngle + Math.PI / 2, 3);
+        }
+
+        Point[] rPoint = new Point[ctlPoint.length];
+        for (int i = 0; i < ctlPoint.length; i++)
+        {
+            rPoint[i] = CommonFunction.RotatePoint(ctlPoint[i], rotateAngle, center);
+        }
+        ctlPoint = rPoint;
+    }
+
+    private void ArcToBezier(double startAngle, double sweepAngle, int stNum)
+    {
+        double x0 = Math.cos(sweepAngle / 2.0);
+        double y0 = Math.sin(sweepAngle / 2.0);
+        double tx = (1.0 - x0) * 4.0 / 3.0;
+        double ty = y0 - tx * x0 / y0;
+
+        double sn = Math.sin(startAngle + sweepAngle / 2.0);
+        double cs = Math.cos(startAngle + sweepAngle / 2.0);
+
+        ctlPoint[stNum] = new Point((float)(center.getX() + a * (x0 * cs + y0 * sn)),
+        							(float)(center.getY() + b * (x0 * sn - y0 * cs)));
+        ctlPoint[stNum + 1] = new Point((float)(center.getX() + a * ((x0 + tx) * cs + ty * sn)),
+        							(float)(center.getY() + b * ((x0 + tx) * sn - ty * cs)));
+        ctlPoint[stNum + 2] = new Point((float)(center.getX() + a * ((x0 + tx) * cs - ty * sn)),
+        							(float)(center.getY() + b * ((x0 + tx) * sn + ty * cs)));
+        ctlPoint[stNum + 3] = new Point((float)(center.getX() + a * (x0 * cs - y0 * sn)),
+        							(float)(center.getY() + b * (x0 * sn + y0 * cs)));
+    }
+
+    public boolean Adapt(List<Point> pList)
+    {
+        double[] fact = new double[6];
+        fact[5] = 1000000;  //系数放大
+        if (!FirstRec_LastSquare(pList, fact)) return false;
+
+        double a = fact[0];
+        double b = fact[1];
+        double c = fact[2];
+        double d = fact[3];
+        double e = fact[4];
+        double f = fact[5];
+
+        if (!(b * b - 4 * a * c < -0.01)) return false;
+
+        double y0 = (2 * a * e - b * d) / (b * b - 4 * a * c);
+        double x0 = (-(d + b * y0)) / (2 * a);
+        center = new Point(x0, y0);
+        rotateAngle = Math.atan2(b, a - c) / 2;
+        double Sin = Math.sin(rotateAngle);
+        double Cos = Math.cos(rotateAngle);
+
+        // 移轴，旋转
+        double sf = a * x0 * x0 + b * x0 * y0 + c * y0 * y0 + d * x0 + e * y0 + f;
+        this.a = Math.sqrt(-sf / (a * Cos * Cos + b * Sin * Cos + c * Sin * Sin));
+        this.b = Math.sqrt(-sf / (a * Sin * Sin - b * Sin * Cos + c * Cos * Cos));
+
+        double pSweepAngle = sweepAngle;
+        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
+        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
+        if (Math.abs(pSweepAngle - 0) > 1e-9)
+        {
+            if (pSweepAngle < 0 && sweepAngle > 0) sweepAngle -= 2 * Math.PI;
+            if (pSweepAngle > 0 && sweepAngle < 0) sweepAngle += 2 * Math.PI;
+        }
+
+        return true;
+    }
+    
+    // 初步识别——最小二乘法
+    private boolean FirstRec_LastSquare(List<Point> pList, double[] fact)
+    {
+
+        // aX^2 + bXY + cY^2 + dX + eY + 1 = 0
+        // 根据最小二乘法，先构造矩阵
+        // | ∑x(4)y(0) ∑x(3)y(1) ∑x(2)y(2) ∑x(3)y(0) ∑x(2)y(1) ∑x(2)y(0) |
+        // | ∑x(3)y(1) ∑x(2)y(2) ∑x(1)y(3) ∑x(2)y(1) ∑x(1)y(2) ∑x(1)y(1) |
+        // | ∑x(2)y(2) ∑x(1)y(3) ∑x(0)y(4) ∑x(1)y(2) ∑x(0)y(3) ∑x(0)y(2) |
+        // | ∑x(3)y(0) ∑x(2)y(1) ∑x(1)y(2) ∑x(2)y(0) ∑x(1)y(1) ∑x(1)y(0) |
+        // | ∑x(2)y(1) ∑x(1)y(2) ∑x(0)y(3) ∑x(1)y(1) ∑x(0)y(2) ∑x(0)y(1) |
+
+        final int n = 5;
+        final double standard_deviation = 0.1;	// 二次曲线标准差
+        double[][] mEle = new double[n][n]; // 取前 n 个点作高斯消元求系数
+        double[][] powNum = new double[n][2]; // 每行公共的 x, y 系数次方
+
+        // x
+        powNum[0][0] = 2;
+        powNum[1][0] = 1;
+        powNum[2][0] = 0;
+        powNum[3][0] = 1;
+        powNum[4][0] = 0;
+
+        // y
+        powNum[0][1] = 0;
+        powNum[1][1] = 1;
+        powNum[2][1] = 2;
+        powNum[3][1] = 0;
+        powNum[4][1] = 1;
+
+        // 构造矩阵
+        for (int j = 0; j < n; j++)
+        {	// row
+            fact[j] = 0;	// fact init
+            for (int k = 0; k < n; k++)
+            {	// col
+                mEle[j][k] = 0;	//matrix element init
+                for (int i = 0; i < pList.size(); i++)
+                {	// each point
+                    mEle[j][k] += Math.pow(pList.get(i).getX(), powNum[j][0] + powNum[k][0])
+                                * Math.pow(pList.get(i).getY(), powNum[j][1] + powNum[k][1]);
+                    if (k == 0)
+                        fact[j] -= Math.pow(pList.get(i).getX(), powNum[j][0])
+                                 * Math.pow(pList.get(i).getY(), powNum[j][1]) * fact[5];
+                }
+            }
+        }
+
+        if (CommonFunction.Gauss(mEle, fact) == false) 	// 高斯消元出现非唯一解
+            return false;
+
+        if (calSD(pList, fact) >= standard_deviation) 	//标准差过大，非二次曲线	
+            return false;
+        return true;
+    }
+    
+    //计算标准差
+    private double calSD(List<Point> pList, double[] fact)
+    {
+
+        // 对所有点求标准差以分析拟合度
+        // 二次曲线中心点为
+        // Y = (2ae - bd) / (b^2 - 4ac)
+        // X = -d/(2a) - bY/(2a)
+        // d = f - (aX^2 + bXY + cY^2)
+        // Q(x,y) = a(x-x0)^2 + b(x-x0)(y-y0) + c(y-y0)^2 + d;
+
+        if (fact[1] * fact[1] > 4 * fact[0] * fact[2])	//if (b*b > 4*a*c)
+        {
+            //此时为双曲线的情况
+            return 1;
+        }
+
+        int number = pList.size();
+        double y0 = (2 * fact[0] * fact[4] - fact[1] * fact[3]) / (fact[1] * fact[1] - 4 * fact[0] * fact[2]);	// ( 2 * a * e - b * d ) / ( b^2 - 4 * a * c )
+        double x0 = (-(fact[3] + fact[1] * y0)) / (2 * fact[0]);	// ( -( d + b * y0 ) ) / ( 2 * a )
+        double d = fact[5] - (fact[0] * x0 * x0 + fact[1] * x0 * y0 + fact[2] * y0 * y0); 	// f - ( aX0^2 + bX0*Y0 + cY0^2 )
+        double t;
+        double sum = 0;//标准差
+
+        for (int i = 0; i < number; i++)
+        {
+            double tx = pList.get(i).getX();
+            double ty = pList.get(i).getY();
+            // t = a(X-X0)^2 + b(X-X0)(Y-Y0) + c(Y-Y0)^2
+            t = fact[0] * (tx - x0) * (tx - x0) +
+                fact[1] * (tx - x0) * (ty - y0) +
+                fact[2] * (ty - y0) * (ty - y0);
+            t /= -d;
+            t -= 1;
+            sum += Math.signum(t) * t;
+        }
+        return sum / number;
+
+    }
+    
 	@Override
 	public boolean isInUnit(Point point) {
 		// TODO Auto-generated method stub
@@ -22,19 +292,21 @@ public class CurveUnit extends BaseUnit {
 	@Override
 	public void translate(Point vector) {
 		// TODO Auto-generated method stub
-		
+		center.setX(center.getX() + vector.getX());
+		center.setY(center.getY() + vector.getY());
 	}
 
 	@Override
 	public void scale(Point vector) {
 		// TODO Auto-generated method stub
-		
+		a = a * vector.getX();
+		b = b * vector.getY();
 	}
 
 	@Override
-	public void rotate(Point vector) {
+	public void rotate(double rotateAngle) {
 		// TODO Auto-generated method stub
-		
+		this.rotateAngle = this.rotateAngle + rotateAngle;
 	}
 
 }

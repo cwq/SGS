@@ -9,6 +9,10 @@ public class Point {
 		this(0, 0);
 	}
 	
+	public Point(double x, double y) {
+		this((float)x, (float)y);
+	}
+	
 	public Point(float x, float y) {
 		this.setX(x);
 		this.setY(y);

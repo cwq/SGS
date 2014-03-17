@@ -45,39 +45,27 @@ public class UnitController {
 	}
 	
 	public void addUnit(BaseUnit u) {
-//		synchronized (units) {
-			units.put(u.getID(), u);
-//		}
+		units.put(u.getID(), u);
 	}
 	
 	public void addGraph(BaseGraph g) {
-		synchronized(graphs) {
-			graphs.add(g);
-		}
+		graphs.add(g);
 	}
 	
 	public void deleteUnit(BaseUnit u) {
-//		synchronized (units) {
-			units.remove(u.getID());
-//		}
+		units.remove(u.getID());
 	}
 	
 	public void deleteGraph(BaseGraph g) {
-		synchronized(graphs) {
-			graphs.remove(g);
-		}
+		graphs.remove(g);
 	}
 	
 	public void clear() {
-//		synchronized (units) {
-			units.clear();
-//		}
+		units.clear();
 		drawingSketch.clear();
 		units.put(drawingSketch.getID(), drawingSketch);
 		selectUnit = null;
-		synchronized(graphs) {
-			graphs.clear();
-		}
+		graphs.clear();
 	}
 	
 	public BaseUnit getSelectUnit() {
@@ -97,7 +85,6 @@ public class UnitController {
 	}
 	
 	public boolean selectUnit(Point p) {
-		ConcurrentHashMap<Long, BaseUnit> units = UnitController.getInstance().getUnits();
 		Iterator<Long> iter = units.keySet().iterator();
 		BaseUnit u;
 		Long key;
@@ -107,7 +94,7 @@ public class UnitController {
 				u = units.get(key);
 				if (u != null && u != drawingSketch) {
 					if(u.isInUnit(p)) {
-						UnitController.getInstance().setSelectUnit(u);
+						setSelectUnit(u);
 						return true;
 					}
 				}
@@ -135,12 +122,10 @@ public class UnitController {
 		//drawingSketch.draw(canvas, painter);
 		ConstraintHandler.Update();
 		for (BaseUnit u : units.values()) {
-//			synchronized (units) {
-				if(u == selectUnit)
-					u.draw(canvas, checkedPainter);
-				else
-					u.draw(canvas, painter);
-			}
-//		}
+			if(u == selectUnit)
+				u.draw(canvas, checkedPainter);
+			else
+				u.draw(canvas, painter);
+		}
 	}
 }

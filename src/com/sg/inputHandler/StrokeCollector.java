@@ -133,7 +133,7 @@ public class StrokeCollector {
 				curUnit = UnitController.getInstance().getSelectUnit();
 			}
 			//识别是否删除（采用android型 拖动删除）
-			points1.clear();
+//			points1.clear();
 			points2.clear();
 			drawingSketch.clear();
 //			drawingSketch.setPointList(new ArrayList<Point>());

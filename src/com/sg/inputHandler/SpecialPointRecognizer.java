@@ -127,49 +127,58 @@ public class SpecialPointRecognizer {
 	 * */
 	private void curvity(List<Point> pList, int[] total) {
 		int n = pList.size();
-		double[] sita = new double[n];
-
-		for (int i = 2; i < n - 2; i++) {
-			double mint = 0.0;
-
-			for (int k = 0; k < 4; k++) {     //有改动 lmc,for (int k = 0; k <= 4; k++)
-				mint += Math.abs(pList.get(i - 2 + k).getY()
-						- pList.get(i).getY());
-			}
-			sita[i] = 0.0;
-
-			for (int j = 1; j < 180; j++) {
-				double tmp = 0.0;
-
-				for (int k = 0; k < 4; k++) {   //有改动 lmc,for (int k = 0; k <= 4; k++)
-					tmp += Math.abs((pList.get(i - 2 + k).getY() - pList.get(i).getY()) * Math.cos(j * Math.PI / 180.0)
-							- (pList.get(i - 2 + k).getX() - pList.get(i).getX()) * Math.sin(j * Math.PI / 180.0));
-				}
-				
-				if(tmp < mint) {
-					mint = tmp;
-					sita[i] = j;
-				}
-			}
-		}
-		Log.v("time121", new Date().getTime()+"");
 		double[] curvity = new double[n];
-		for(int i = 2; i < n-2; i++) {
-			double tmp = 0.0;
-			for(int k = 1; k < 4; k++) {
-				tmp += Math.abs(sita[i - 2 + k] - sita[i - 3 + k]);
-			}
-			
-			curvity[i] = (tmp / CommonFunction.distance(pList.get(i-2), pList.get(i+2)));
-			
-			if(Math.abs(curvity[i]) > 100) {    //处理可能为异常抖动的点
-				curvity[i] = 0;
-				total[i] -= 1;
-				if(total[i] >= 2) {
-					total[i] += 1;
-				}
-			}
+//		double[] sita = new double[n];
+
+		curvity[0] = curvity[n - 1] = 0;
+		for (int i = 1; i < n-1; i++) {
+			double sinA = Math.sin(Math.abs(CommonFunction.VectorToAngle(pList.get(i-1), pList.get(i)) -
+					CommonFunction.VectorToAngle(pList.get(i+1), pList.get(i))));
+			curvity[i] = 2 * sinA / CommonFunction.distance(pList.get(i-1), pList.get(i+1));
 		}
+		
+		
+//		for (int i = 2; i < n - 2; i++) {
+//			double mint = 0.0;
+//
+//			for (int k = 0; k < 4; k++) {     //有改动 lmc,for (int k = 0; k <= 4; k++)
+//				mint += Math.abs(pList.get(i - 2 + k).getY()
+//						- pList.get(i).getY());
+//			}
+//			sita[i] = 0.0;
+//
+//			for (int j = 1; j < 180; j++) {
+//				double tmp = 0.0;
+//
+//				for (int k = 0; k < 4; k++) {   //有改动 lmc,for (int k = 0; k <= 4; k++)
+//					tmp += Math.abs((pList.get(i - 2 + k).getY() - pList.get(i).getY()) * Math.cos(j * Math.PI / 180.0)
+//							- (pList.get(i - 2 + k).getX() - pList.get(i).getX()) * Math.sin(j * Math.PI / 180.0));
+//				}
+//				
+//				if(tmp < mint) {
+//					mint = tmp;
+//					sita[i] = j;
+//				}
+//			}
+//		}
+//		Log.v("time121", new Date().getTime()+"");
+//		
+//		for(int i = 2; i < n-2; i++) {
+//			double tmp = 0.0;
+//			for(int k = 1; k < 4; k++) {
+//				tmp += Math.abs(sita[i - 2 + k] - sita[i - 3 + k]);
+//			}
+//			
+//			curvity[i] = (tmp / CommonFunction.distance(pList.get(i-2), pList.get(i+2)));
+//			
+//			if(Math.abs(curvity[i]) > 100) {    //处理可能为异常抖动的点
+//				curvity[i] = 0;
+//				total[i] -= 1;
+//				if(total[i] >= 2) {
+//					total[i] += 1;
+//				}
+//			}
+//		}
 		
 		double average = 0.0;
 		for(int i = 0; i < n; i++) {

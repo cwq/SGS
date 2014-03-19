@@ -40,30 +40,6 @@ public class UnitRecognizer {
 	}
 	
 	
-	private boolean isLine(List<Point> points) {
-		int n = points.size();
-		if (n < 2) {
-			return false;
-		}
-        //判断是否是直线图元的方法：若首末两点的距离比上所有的两两相邻的点之间的距离之和，比之大于阀值的话，则判断为直线图元
-        //阀值暂定为0.95
-		double totalLength = 0.0;
-		double tmpLength = CommonFunction.distance(points.get(0), points.get(n-1));
-		
-		if (tmpLength < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
-			return false;
-		}
-		for(int i = 0; i < n-1; i++) {
-			totalLength += CommonFunction.distance(points.get(i), points.get(i+1));
-		}
-		
-		if(tmpLength / totalLength >= 0.98) {
-			return true;
-		}
-		
-		return false;
-	}
-	
 	/**
 	 * 对时间阈值内收集的点进行处理  识别
 	 * @param points
@@ -73,7 +49,7 @@ public class UnitRecognizer {
 		List<Integer> ins = SpecialPointRecognizer.getInstance().getSpecialPointIndex(points);
 		if (ins.size() < 2)  return;
 		if (ins.size() == 2) {
-			if (isLine(points)) {
+			if (((LineUnit) (new LineUnit())).Adapt(points)) {
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
 				UnitController.getInstance().addUnit(lastUnit);
 			} else {

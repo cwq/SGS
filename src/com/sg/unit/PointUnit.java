@@ -13,7 +13,9 @@ public class PointUnit extends BaseUnit {
 	private float X;
 	private float Y;
 	
-	public PointUnit() {}
+	public PointUnit() {
+		X = Y = 0;
+	}
 
 	public PointUnit(PointUnit p) {
 		this.Set(p);

@@ -49,7 +49,7 @@ public class ThresholdProperty {
 		POINT_COUNT = 20;
 		POINT_DISTANCE = 8 * density;
 		POINT_SELECTED_DISTANCE = 20 * density;
-		JUDGE_LINE_VALUE = 0.9;
+		JUDGE_LINE_VALUE = 0.98;
 		PRESS_TIME_SHORT = 200;
 		PRESS_TIME_LONG = 1000;
 		GRAPH_CHECKED_DISTANCE = 30 * density;

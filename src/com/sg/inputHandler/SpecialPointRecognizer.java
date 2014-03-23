@@ -202,15 +202,15 @@ public class SpecialPointRecognizer {
 	}
 	
 	/**
-	 * 对系列电进一步处理
+	 * 对系列电进一步处理，去除相离很近的重复特征点
 	 * @param total 
 	 * */
 	private void space(List<Point> pList, int[] total) {
 		int n = pList.size();
 		
-			for(int i = 1; i < n; i++) {
+			for(int i = 1; i < n-1; i++) {
 				if( total[i] >= 2 ) {
-					//去除改点前附近的噪点
+					//去除该点前附近的噪点
 					for(int j = i-1; j >= 0; j--) {
 						if(total[j] >= 2 && CommonFunction.distance(pList.get(i),pList.get(j)) <= 
 								ThresholdProperty.TWO_POINT_IS_CLOSED) {
@@ -218,11 +218,11 @@ public class SpecialPointRecognizer {
 						}
 					}
 				}
-//				if((total[i] >= 2) && (CommonFunction.distance(pList.get(i),pList.get(n -1)) <=
-//						ThresholdProperty.TWO_POINT_IS_CLOSED)){
-//					//处理末尾附近点的冗余
-//					total[i] -= 1;
-//				}
+				if((total[i] >= 2) && (CommonFunction.distance(pList.get(i),pList.get(n -1)) <=
+						ThresholdProperty.TWO_POINT_IS_CLOSED)){
+					//处理末尾附近点的冗余
+					total[i] -= 1;
+				}
 			}
 	}
 	

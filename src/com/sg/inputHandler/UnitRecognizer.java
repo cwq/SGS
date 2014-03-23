@@ -50,9 +50,11 @@ public class UnitRecognizer {
 		if (ins.size() < 2)  return;
 		if (ins.size() == 2) {
 			if (((LineUnit) (new LineUnit())).Adapt(points)) {
+				//识别直线
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
 				UnitController.getInstance().addUnit(lastUnit);
 			} else {
+				//识别曲线
 				lastUnit = new CurveUnit();
 				if(((CurveUnit)lastUnit).Adapt(points) == true) {
 					UnitController.getInstance().addUnit(lastUnit);

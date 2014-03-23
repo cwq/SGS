@@ -74,16 +74,17 @@ public class SpecialPointRecognizer {
 			average += tempSpeed;
 		}
 		average /= n;
-		for (int i = 0; i < n; i++) {
+		for (int i = 1; i < n-1; i++) {
 			if (speed[i] < average * 0.42) {
 				total[i] += 1;;
 			}
 		}
-		
+		total[0] += 1;
+		total[n-1] += 1;
 	}
 	
 	/**
-	 * 方向过滤方法 对于点i；边<i-1,i>和边<i,i+1>之间的夹角来判断是否平滑过渡 夹角大于175度时，平滑过渡，否则，点i为一个转折点
+	 * 方向过滤方法 对于点i；边<i-1,i>和边<i,i+1>之间的夹角来判断是否平滑过渡 夹角大于170度时，平滑过渡，否则，点i为一个转折点
 	 * 运用余弦定理求解角度
 	 * @param pList
 	 * @param total 
@@ -106,7 +107,7 @@ public class SpecialPointRecognizer {
 		for (int i = 1; i < n - 1; i++) {
 			if (direction[i] <= 170.0) {
                 total[i] += 1;
-				}
+			}
 		}
 		total[0] += 1;
 		total[n-1] += 1;
@@ -132,9 +133,11 @@ public class SpecialPointRecognizer {
 
 		curvity[0] = curvity[n - 1] = 0;
 		for (int i = 1; i < n-1; i++) {
+			//角度计算错误
 			double sinA = Math.sin(Math.abs(CommonFunction.VectorToAngle(pList.get(i-1), pList.get(i)) -
 					CommonFunction.VectorToAngle(pList.get(i+1), pList.get(i))));
 			curvity[i] = 2 * sinA / CommonFunction.distance(pList.get(i-1), pList.get(i+1));
+			Log.v("curvity", (float)curvity[i] + " , "+i+" , " + pList.get(i).toString());
 		}
 		
 		
@@ -185,6 +188,7 @@ public class SpecialPointRecognizer {
 			average += curvity[i];
 		}
 		average /= n;
+		Log.v("curvity", " average "+average);
 		
 		for(int i = 1; i < n-1; i++) {
 			if(curvity[i] > average * 1.0) {
@@ -204,24 +208,22 @@ public class SpecialPointRecognizer {
 	private void space(List<Point> pList, int[] total) {
 		int n = pList.size();
 		
-			for(int i = 1; i < n-1; i++) {
-				if( total[i] >= 3 ) {      //去除起始点附近的噪点
+			for(int i = 1; i < n; i++) {
+				if( total[i] >= 2 ) {
+					//去除改点前附近的噪点
 					for(int j = i-1; j >= 0; j--) {
-						if(total[j] >= 3 && 
-								CommonFunction.distance(pList.get(i),pList.get(j)) <= ThresholdProperty.TWO_POINT_IS_CLOSED) {
+						if(total[j] >= 2 && CommonFunction.distance(pList.get(i),pList.get(j)) <= 
+								ThresholdProperty.TWO_POINT_IS_CLOSED) {
 							total[i] -= 1;
 						}
 					}
 				}
-				if((total[i] >= 3)&&
-						(CommonFunction.distance(pList.get(i),pList.get(n -1))<ThresholdProperty.TWO_POINT_IS_CLOSED)){          //处理末尾附近点的冗余
-					total[i] -= 1;
+//				if((total[i] >= 2) && (CommonFunction.distance(pList.get(i),pList.get(n -1)) <=
+//						ThresholdProperty.TWO_POINT_IS_CLOSED)){
+//					//处理末尾附近点的冗余
+//					total[i] -= 1;
+//				}
 			}
-				total[i] += 1;
-			}
-			total[0] += 1;
-			total[n-1] += 1;
-			
 	}
 	
 	/**
@@ -233,17 +235,14 @@ public class SpecialPointRecognizer {
 		//gaussProcessing(pList);
 		int[] total = new int[pList.size()];
 		speed(pList, total);
-		Log.v("time11", new Date().getTime()+"");
 		direction(pList, total);
-		Log.v("time12", new Date().getTime()+"");
-		curvity(pList, total);
-		Log.v("time13", new Date().getTime()+"");
+//		curvity(pList, total);
 		space(pList, total);
-		Log.v("time14", new Date().getTime()+"");
+
 		List<Integer> specialPointIndexs = new ArrayList<Integer>();
 		int n = pList.size();
 		for(int i=0; i < n; i++) {
-			if(total[i] >= 4) {    //特征值大于等于4的点为特征点
+			if(total[i] >= 2) {    //特征值大于等于4的点为特征点
 				specialPointIndexs.add(i);
 			}
 		}

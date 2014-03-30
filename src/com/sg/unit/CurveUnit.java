@@ -12,11 +12,11 @@ import com.sg.property.tools.Painter;
 
 public class CurveUnit extends BaseUnit {
 	
-    public double a;
+    public double a;          //曲线两个轴长
     public double b;
     public Point center;
     public double startAngle;
-    public double sweepAngle;
+    public double sweepAngle;  //逆时针为正 顺时钟为负
     public double rotateAngle;
 
     private Point[] ctlPoint;   //贝塞尔曲线控制点
@@ -174,14 +174,33 @@ public class CurveUnit extends BaseUnit {
         this.a = Math.sqrt(-sf / (a * Cos * Cos + b * Sin * Cos + c * Sin * Sin));
         this.b = Math.sqrt(-sf / (a * Sin * Sin - b * Sin * Cos + c * Cos * Cos));
 
-        double pSweepAngle = sweepAngle;
+//        double pSweepAngle = sweepAngle;
+//        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
+//        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
+//        if (Math.abs(pSweepAngle - 0) > 1e-9)
+//        {
+//            if (pSweepAngle < 0 && sweepAngle > 0) sweepAngle -= 2 * Math.PI;
+//            if (pSweepAngle > 0 && sweepAngle < 0) sweepAngle += 2 * Math.PI;
+//        }
         startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
         sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
-        if (Math.abs(pSweepAngle - 0) > 1e-9)
-        {
-            if (pSweepAngle < 0 && sweepAngle > 0) sweepAngle -= 2 * Math.PI;
-            if (pSweepAngle > 0 && sweepAngle < 0) sweepAngle += 2 * Math.PI;
-        }
+        
+        boolean ccw = false;	//是否逆时针排列	
+		Point v1 = new Point(pList.get(0).getX() - center.getX(), pList.get(0).getY() - center.getY());
+		Point v2 = new Point(pList.get(4).getX() - center.getX(), pList.get(4).getY() - center.getY());
+		if(v1.getX()*v2.getY() - v1.getY()*v2.getX() > 0) ccw = true;
+		
+		if (ccw) {
+			//如果是逆时针
+			if (sweepAngle < 0) {
+				sweepAngle += 2 * Math.PI;
+			}
+		} else {
+			//如果是顺时针
+			if (sweepAngle > 0) {
+				sweepAngle -= 2 * Math.PI;
+			}
+		}
 
         return true;
     }

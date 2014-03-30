@@ -182,26 +182,38 @@ public class CurveUnit extends BaseUnit {
 //            if (pSweepAngle < 0 && sweepAngle > 0) sweepAngle -= 2 * Math.PI;
 //            if (pSweepAngle > 0 && sweepAngle < 0) sweepAngle += 2 * Math.PI;
 //        }
-        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
-        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
-        
-        boolean ccw = false;	//是否逆时针排列	
-		Point v1 = new Point(pList.get(0).getX() - center.getX(), pList.get(0).getY() - center.getY());
-		Point v2 = new Point(pList.get(4).getX() - center.getX(), pList.get(4).getY() - center.getY());
-		if(v1.getX()*v2.getY() - v1.getY()*v2.getX() > 0) ccw = true;
 		
-		if (ccw) {
-			//如果是逆时针
-			if (sweepAngle < 0) {
-				sweepAngle += 2 * Math.PI;
-			}
+		double sum = 0;
+		for (int i = 0; i < pList.size() - 1; i++) {
+			sum += Math.abs(CommonFunction.VectorToAngle(pList.get(i + 1), center)
+					- CommonFunction.VectorToAngle(pList.get(i), center));
+		}
+		if (Math.abs(sum) > 3.8 * Math.PI) {
+			//曲线闭合
+			startAngle = 0;
+			sweepAngle = 2 * Math.PI;
 		} else {
-			//如果是顺时针
-			if (sweepAngle > 0) {
-				sweepAngle -= 2 * Math.PI;
+			//曲线不闭合
+	        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
+	        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
+	        
+	        boolean ccw = false;	//是否逆时针排列	
+			Point v1 = new Point(pList.get(0).getX() - center.getX(), pList.get(0).getY() - center.getY());
+			Point v2 = new Point(pList.get(4).getX() - center.getX(), pList.get(4).getY() - center.getY());
+			if(v1.getX()*v2.getY() - v1.getY()*v2.getX() > 0) ccw = true;
+			
+			if (ccw) {
+				//如果是逆时针
+				if (sweepAngle < 0) {
+					sweepAngle += 2 * Math.PI;
+				}
+			} else {
+				//如果是顺时针
+				if (sweepAngle > 0) {
+					sweepAngle -= 2 * Math.PI;
+				}
 			}
 		}
-
         return true;
     }
     

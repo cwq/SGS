@@ -1,9 +1,7 @@
 package com.sg.inputHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import android.net.NetworkInfo.State;
 import android.util.Log;
 
 import com.sg.constraint.CstPointsSamePos;
@@ -69,7 +67,12 @@ public class UnitRecognizer {
 		if (ins.size() > 2) {
 			//折线
 			for (int i = 0; i < ins.size() - 1; i++) {
-				lastUnit = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
+				LineUnit temp = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
+				if (i > 0) {
+					//添加约束
+					CstPointsSamePos.Add(((LineUnit) lastUnit).getEnd2(), temp.getEnd1());
+				}
+				lastUnit = temp;
 				UnitController.getInstance().addUnit(lastUnit);
 			}
 		} 

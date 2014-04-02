@@ -16,7 +16,7 @@ public class CurveUnit extends BaseUnit implements IChangable {
 	
     public double a;          //曲线两个轴长
     public double b;
-    public Point center;
+    public PointUnit center;
     public double startAngle;
     public double sweepAngle;  //逆时针为正 顺时钟为负
     public double rotateAngle;

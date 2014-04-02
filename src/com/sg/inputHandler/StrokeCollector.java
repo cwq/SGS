@@ -31,7 +31,7 @@ public class StrokeCollector {
 	private int state;
 	
 	public StrokeCollector() {
-		points1 = new Vector<Point>();
+		points1 = new ArrayList<Point>();
 		points2 = new ArrayList<Point>();
 		drawingSketch = UnitController.getInstance().getSketchUnit();
 	}
@@ -80,7 +80,7 @@ public class StrokeCollector {
 						UnitController.getInstance().getSelectUnit().isInUnit(points1.get(0))) {
 					Log.v("sc", "state0 : 当前有图元选中  识别手势");
 					//如果当前有图元选中  并且起 始点中选择的图元  识别手势
-					ins.recognize(movePoint);
+					ins.recognize(points1);
 					state = 1;
 					break;
 				}
@@ -109,7 +109,7 @@ public class StrokeCollector {
 					ins.recognize(movePoint, new Point(event.getX(1), event.getY(1)));
 				} else {
 					Log.v("sc", "state1 : 单点手势");
-					ins.recognize(movePoint);
+					ins.recognize(points1);
 				}
 				break;
 			case 2: //图元识别

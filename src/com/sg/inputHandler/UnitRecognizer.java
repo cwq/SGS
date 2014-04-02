@@ -6,6 +6,7 @@ import java.util.List;
 import android.net.NetworkInfo.State;
 import android.util.Log;
 
+import com.sg.constraint.CstPointsSamePos;
 import com.sg.controller.UnitController;
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
@@ -45,7 +46,7 @@ public class UnitRecognizer {
 	 * @param points
 	 */
 	public void recognizeFirstPart(List<Point> points) {
-//		SpecialPointRecognizer.getInstance().gaussProcessing(points);
+		SpecialPointRecognizer.getInstance().gaussProcessing(points);
 		List<Integer> ins = SpecialPointRecognizer.getInstance().getSpecialPointIndex(points);
 		if (ins.size() < 2)  return;
 		if (ins.size() == 2) {
@@ -80,10 +81,10 @@ public class UnitRecognizer {
 		if (lastUnit == null)  return;
 		if (lastUnit instanceof LineUnit) {
 			LineUnit temp = (LineUnit) lastUnit;
-			double A = CommonFunction.distance(temp.getEnd1().getPoint(), p);
-			double B = CommonFunction.distance(temp.getEnd2().getPoint(), p);
-			double C = CommonFunction.distance(temp.getEnd1().getPoint(), ((LineUnit) lastUnit).getEnd2().getPoint());
-			double disL = CommonFunction.distance(temp.getEnd1().getPoint(), temp.getEnd2().getPoint());
+			double A = CommonFunction.distance(temp.getEnd1().toPoint(), p);
+			double B = CommonFunction.distance(temp.getEnd2().toPoint(), p);
+			double C = CommonFunction.distance(temp.getEnd1().toPoint(), ((LineUnit) lastUnit).getEnd2().toPoint());
+			double disL = CommonFunction.distance(temp.getEnd1().toPoint(), temp.getEnd2().toPoint());
 			
 			double tmp = B * B + C * C - A * A;
 			tmp = tmp / (2 * B * C + 0.00001);
@@ -117,8 +118,11 @@ public class UnitRecognizer {
 			
 			if (ridian * 180.0 / Math.PI <= 150.0 && disL > ThresholdProperty.TWO_POINT_IS_CLOSED) {
 				
-				lastUnit = new LineUnit(temp.getEnd2().getPoint(), p);
+				lastUnit = new LineUnit(temp.getEnd2().toPoint(), p);
 				UnitController.getInstance().addUnit(lastUnit);
+				//添加约束
+				CstPointsSamePos.Add(temp.getEnd2(), ((LineUnit) lastUnit).getEnd1());
+				
 			} else {
 				((LineUnit) lastUnit).setEnd2(new PointUnit(p));
 			}

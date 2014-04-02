@@ -1,8 +1,10 @@
 package com.sg.unit;
 
+import android.R.string;
 import android.graphics.Canvas;
 
 import com.sg.constraint.ConstraintHandler;
+import com.sg.constraint.UnitChangeArgs;
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
@@ -38,9 +40,7 @@ public class PointUnit extends BaseUnit {
 	}
 
 	public void setX(float x) {
-		X = x;
-		if (ConstraintHandler.IsInUcKeys(this))
-			ConstraintHandler.Changed(this);
+		this.Set(x, this.Y);
 	}
 
 	public float getY() {
@@ -48,13 +48,40 @@ public class PointUnit extends BaseUnit {
 	}
 
 	public void setY(float y) {
-		Y = y;
-		if (ConstraintHandler.IsInUcKeys(this))
-			ConstraintHandler.Changed(this);
+		this.Set(this.X, y);
 	}
 	
-	public Point getPoint() {
+	public Point toPoint() {
 		return new Point(X, Y);
+	}
+	
+	public void Set(float x, float y) {
+		Set(x, y, null);
+	}
+	
+	public void Set(double x, double y) {
+		Set((float)x, (float)y);
+	}
+	
+	public void Set(float x, float y, UnitChangeArgs e) {
+		if(Math.abs(x - this.X) < ThresholdProperty.FLOAT_OFFSET
+				&& Math.abs(y - this.Y) < ThresholdProperty.FLOAT_OFFSET) {
+			return;
+		}
+		
+		if (e != null && e.constains(this)) return;
+		if (e == null) e = new UnitChangeArgs(this, this.X, this.Y);
+		if (e.isHandled()) return;
+		
+		this.X = x;
+		this.Y = y;
+		
+		notifies(e);
+	}
+	
+	@Override
+	public String toString() {
+		return "Point(" + this.getID() + ") " + this.X + ", " + this.Y;
 	}
 
 	@Override
@@ -78,7 +105,7 @@ public class PointUnit extends BaseUnit {
 	@Override
 	public void translate(Point vector) {
 		// TODO Auto-generated method stub
-		
+		this.Set(this.getX() + vector.getX(), this.getY() + vector.getY());
 	}
 
 	@Override

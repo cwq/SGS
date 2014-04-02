@@ -120,7 +120,6 @@ public class UnitController {
 //			}
 //		}
 		//drawingSketch.draw(canvas, painter);
-		ConstraintHandler.Update();
 		for (BaseUnit u : units.values()) {
 			if(u == selectUnit)
 				u.draw(canvas, checkedPainter);

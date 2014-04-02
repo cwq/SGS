@@ -1,10 +1,8 @@
 package com.sg.constraint;
 
+import java.util.EventListener;
+
 import com.sg.unit.BaseUnit;
 
-public abstract class BaseConstraint {
-	
-	public abstract void UpdateConstraint();
-	public abstract boolean isInConstraint(BaseUnit unit);
-	
+public abstract class BaseConstraint implements EventListener {	
 }

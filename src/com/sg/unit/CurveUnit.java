@@ -5,12 +5,14 @@ import java.util.List;
 import android.graphics.Canvas;
 import android.graphics.Path;
 
+import com.sg.constraint.IChangable;
+import com.sg.constraint.UnitChangeArgs;
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
-public class CurveUnit extends BaseUnit {
+public class CurveUnit extends BaseUnit implements IChangable {
 	
     public double a;          //曲线两个轴长
     public double b;
@@ -27,13 +29,18 @@ public class CurveUnit extends BaseUnit {
 
     public CurveUnit(Point c, double a, double b, double startAngle, double sweepAngle, double rotateAngle)
     {
-        center = c;
+        center = new PointUnit(c);
         this.a = a;
         this.b = b;
         this.startAngle = startAngle;
         this.sweepAngle = sweepAngle;
         this.rotateAngle = rotateAngle;
-    }    
+        this.center.addUnitListener(this);
+    }
+    
+    public void OnChange(UnitChangeArgs e) {
+    	notifies(e.Next(this));
+    }
     
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
@@ -122,7 +129,7 @@ public class CurveUnit extends BaseUnit {
         Point[] rPoint = new Point[ctlPoint.length];
         for (int i = 0; i < ctlPoint.length; i++)
         {
-            rPoint[i] = CommonFunction.RotatePoint(ctlPoint[i], rotateAngle, center);
+            rPoint[i] = CommonFunction.RotatePoint(ctlPoint[i], rotateAngle, center.toPoint());
         }
         ctlPoint = rPoint;
     }
@@ -164,7 +171,7 @@ public class CurveUnit extends BaseUnit {
 
         double y0 = (2 * a * e - b * d) / (b * b - 4 * a * c);
         double x0 = (-(d + b * y0)) / (2 * a);
-        center = new Point(x0, y0);
+        center.Set(x0, y0);
         rotateAngle = Math.atan2(b, a - c) / 2;
         double Sin = Math.sin(rotateAngle);
         double Cos = Math.cos(rotateAngle);
@@ -175,18 +182,18 @@ public class CurveUnit extends BaseUnit {
         this.b = Math.sqrt(-sf / (a * Sin * Sin - b * Sin * Cos + c * Cos * Cos));
 
 //        double pSweepAngle = sweepAngle;
-//        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
-//        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
+//        startAngle = CommonFunction.VectorToAngle(pList.get(0), center.toPoint()) - rotateAngle;
+//        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center.toPoint()) - startAngle - rotateAngle;
 //        if (Math.abs(pSweepAngle - 0) > 1e-9)
 //        {
 //            if (pSweepAngle < 0 && sweepAngle > 0) sweepAngle -= 2 * Math.PI;
 //            if (pSweepAngle > 0 && sweepAngle < 0) sweepAngle += 2 * Math.PI;
 //        }
-		
+        
 		double sum = 0;
 		for (int i = 0; i < pList.size() - 1; i++) {
-			sum += Math.abs(CommonFunction.VectorToAngle(pList.get(i + 1), center)
-					- CommonFunction.VectorToAngle(pList.get(i), center));
+			sum += Math.abs(CommonFunction.VectorToAngle(pList.get(i + 1), center.toPoint())
+					- CommonFunction.VectorToAngle(pList.get(i), center.toPoint()));
 		}
 		if (Math.abs(sum) > 3.8 * Math.PI) {
 			//曲线闭合
@@ -194,8 +201,8 @@ public class CurveUnit extends BaseUnit {
 			sweepAngle = 2 * Math.PI;
 		} else {
 			//曲线不闭合
-	        startAngle = CommonFunction.VectorToAngle(pList.get(0), center) - rotateAngle;
-	        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center) - startAngle - rotateAngle;
+	        startAngle = CommonFunction.VectorToAngle(pList.get(0), center.toPoint()) - rotateAngle;
+	        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center.toPoint()) - startAngle - rotateAngle;
 	        
 	        boolean ccw = false;	//是否逆时针排列	
 			Point v1 = new Point(pList.get(0).getX() - center.getX(), pList.get(0).getY() - center.getY());
@@ -214,6 +221,7 @@ public class CurveUnit extends BaseUnit {
 				}
 			}
 		}
+
         return true;
     }
     
@@ -318,6 +326,72 @@ public class CurveUnit extends BaseUnit {
 	public boolean isInUnit(Point point) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void setAB(double a, double b, UnitChangeArgs e) {
+        if (Math.abs(a - this.a) < ThresholdProperty.FLOAT_OFFSET
+        		&& Math.abs(b - this.b) < ThresholdProperty.FLOAT_OFFSET)
+            return;
+
+        if (e != null && e.constains(this)) return;
+        if (e == null) e = new UnitChangeArgs(this, (float)this.a, (float)this.b);
+        if (e.isHandled()) return;
+        
+        this.a = a;
+        this.b = b;
+        
+        OnChange(e);
+	}
+	public void setAB(double a, double b) {
+        this.setAB(a, b, null);
+	}
+	
+	public void setA(double a) {
+		this.setAB(a, this.b);
+	}
+	
+	public void setB(double b) {
+		this.setAB(this.a, b);
+	}
+	
+	public void setCenter(Point p) {
+		this.center.Set(p);
+	}
+	
+	public double getStartAngle() {
+		return startAngle;
+	}
+
+	public void setStartAngle(double startAngle) {
+		this.startAngle = startAngle;
+	}
+
+	public double getSweepAngle() {
+		return sweepAngle;
+	}
+
+	public void setSweepAngle(double sweepAngle) {
+		this.sweepAngle = sweepAngle;
+	}
+
+	public double getRotateAngle() {
+		return rotateAngle;
+	}
+
+	public void setRotateAngle(double rotateAngle) {
+		this.rotateAngle = rotateAngle;
+	}
+
+	public double getA() {
+		return a;
+	}
+
+	public double getB() {
+		return b;
+	}
+
+	public PointUnit getCenter() {
+		return center;
 	}
 
 	@Override

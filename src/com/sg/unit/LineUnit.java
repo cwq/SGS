@@ -4,24 +4,31 @@ import java.util.List;
 
 import android.graphics.Canvas;
 
+import com.sg.constraint.IChangable;
+import com.sg.constraint.UnitChangeArgs;
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
-public class LineUnit extends BaseUnit {
+public class LineUnit extends BaseUnit implements IChangable {
 	
 	private PointUnit end1;
 	private PointUnit end2;
 	
 	public LineUnit() {
-		end1 = new PointUnit();
-		end2 = new PointUnit();
+		this(new Point(), new Point());
 	}
 	
 	public LineUnit(Point p1, Point p2) {
-		end1 = new PointUnit(p1);
-		end2 = new PointUnit(p2);
+		this.end1 = new PointUnit(p1);
+		this.end2 = new PointUnit(p2);
+		this.end1.addUnitListener(this);
+		this.end2.addUnitListener(this);
+	}
+	
+	public void OnChange(UnitChangeArgs e) {
+		notifies(e.Next(this));
 	}
 	
 	public PointUnit getEnd1() {
@@ -51,10 +58,10 @@ public class LineUnit extends BaseUnit {
 	@Override
 	public boolean isInUnit(Point point) {
 		// TODO Auto-generated method stub
-		double checkdistance1 = CommonFunction.distance(end1.getPoint(), point);
-		double checkdistance2 = CommonFunction.distance(end2.getPoint(), point);
-		double linedistance = CommonFunction.distance(end1.getPoint(), end2.getPoint());
-		double curDistance = CommonFunction.pointToLineDistance(end1.getPoint(), end2.getPoint(), point);
+		double checkdistance1 = CommonFunction.distance(end1.toPoint(), point);
+		double checkdistance2 = CommonFunction.distance(end2.toPoint(), point);
+		double linedistance = CommonFunction.distance(end1.toPoint(), end2.toPoint());
+		double curDistance = CommonFunction.pointToLineDistance(end1.toPoint(), end2.toPoint(), point);
 		if(checkdistance1 < linedistance && checkdistance2 < linedistance && curDistance < ThresholdProperty.GRAPH_CHECKED_DISTANCE){
 			return true;
 		}else{
@@ -93,9 +100,15 @@ public class LineUnit extends BaseUnit {
 	}
 	
 	@Override
+	public String toString() {
+		return "Line(" + this.getID() +")";
+	}
+	
+	@Override
 	public void translate(Point vector) {
 		// TODO Auto-generated method stub
-		
+		end1.translate(vector);
+		end2.translate(vector);
 	}
 	
 	@Override

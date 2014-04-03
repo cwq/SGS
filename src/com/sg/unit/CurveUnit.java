@@ -14,12 +14,12 @@ import com.sg.property.tools.Painter;
 
 public class CurveUnit extends BaseUnit implements IChangable {
 	
-    public double a;          //曲线两个轴长
-    public double b;
-    public PointUnit center;
-    public double startAngle;
-    public double sweepAngle;  //逆时针为正 顺时钟为负
-    public double rotateAngle;
+    private double a;          //曲线两个轴长
+    private double b;
+    private PointUnit center;
+    private double startAngle;
+    private double sweepAngle;  //逆时针为正 顺时钟为负
+    private double rotateAngle;
 
     private Point[] ctlPoint;   //贝塞尔曲线控制点
     

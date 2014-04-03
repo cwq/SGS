@@ -1,5 +1,7 @@
 package com.sg.graph;
 
-public class BaseGraph {
+import com.sg.unit.SGEventObject;
+
+public class BaseGraph extends SGEventObject {
 
 }

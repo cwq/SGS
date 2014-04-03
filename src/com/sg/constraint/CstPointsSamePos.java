@@ -7,7 +7,7 @@ import java.util.List;
 
 import com.sg.unit.*;
 
-public class CstPointsSamePos extends BaseConstraint implements IChangable {
+public class CstPointsSamePos extends BaseConstraint {
 	
 	private static CstPointsSamePos instance = new CstPointsSamePos();
 	public static CstPointsSamePos getInstance() {

@@ -1,7 +1,9 @@
 package com.sg.inputHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import android.net.NetworkInfo.State;
 import android.util.Log;
 
 import com.sg.constraint.CstPointsSamePos;

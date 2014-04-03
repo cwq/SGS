@@ -4,5 +4,6 @@ import java.util.EventListener;
 
 import com.sg.unit.BaseUnit;
 
-public abstract class BaseConstraint implements EventListener {	
+public abstract class BaseConstraint  
+		implements IChangable, EventListener {	
 }

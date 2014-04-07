@@ -3,9 +3,6 @@ package com.sg.inputHandler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
-
-import com.sg.constraint.BaseConstraint;
 import com.sg.constraint.ConstraintHandler;
 import com.sg.controller.UnitController;
 import com.sg.property.common.Point;
@@ -52,7 +49,6 @@ public class StrokeCollector {
 			Point startPoint = new Point(event.getX(0), event.getY(0));
 			points1.add(startPoint);
 			drawingSketch.setPointList(points1);
-			GestureRecognizer.getInstance().setFirstPoint(startPoint);
 			Log.v("sc", "down: "+downTime);
 			break;
 		case MotionEvent.ACTION_MOVE:
@@ -124,6 +120,10 @@ public class StrokeCollector {
 			break;
 		case MotionEvent.ACTION_UP:
 			Log.v("sc", "up1");
+			
+			//手势识别中whichPoint设置为0:还未识别是否点中点元
+			GestureRecognizer.getInstance().setWhichPoint(0);
+			
 			BaseUnit curUnit;
 			//图元识别
 			if (state == 0 || state == 2) {

@@ -58,6 +58,9 @@ public class LineUnit extends BaseUnit implements IChangable {
 	@Override
 	public boolean isInUnit(Point point) {
 		// TODO Auto-generated method stub
+		if (end1.isInUnit(point) || end2.isInUnit(point)) {
+			return true;
+		}
 		double checkdistance1 = CommonFunction.distance(end1.toPoint(), point);
 		double checkdistance2 = CommonFunction.distance(end2.toPoint(), point);
 		double linedistance = CommonFunction.distance(end1.toPoint(), end2.toPoint());

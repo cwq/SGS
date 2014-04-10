@@ -1,10 +1,10 @@
 package com.sg.constraint;
 
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.sg.object.SGObject;
 import com.sg.unit.*;
 
 public class CstPointsSamePos extends BaseConstraint {
@@ -17,16 +17,27 @@ public class CstPointsSamePos extends BaseConstraint {
 	private CstPointsSamePos() {
 	}
 	
-	public static Dictionary<PointUnit, List<PointUnit>> cstMap
-			= new Hashtable<PointUnit, List<PointUnit>>();
+	public static HashMap<PointUnit, Set<PointUnit>> cstMap
+			= new HashMap<PointUnit, Set<PointUnit>>();
 
 	public static void Add(PointUnit a, PointUnit b) {
-		if (cstMap.get(a) == null) cstMap.put(a, new ArrayList<PointUnit>());
-		if (cstMap.get(b) == null) cstMap.put(b, new ArrayList<PointUnit>());
+		if (cstMap.get(a) == null) cstMap.put(a, new HashSet<PointUnit>());
+		if (cstMap.get(b) == null) cstMap.put(b, new HashSet<PointUnit>());
 		cstMap.get(a).add(b);
 		cstMap.get(b).add(a);
 		a.addUnitListener(CstPointsSamePos.getInstance());
 		b.addUnitListener(CstPointsSamePos.getInstance());
+	}
+
+	public static boolean isRelated(SGObject o1, SGObject o2) {
+		for (PointUnit itp : cstMap.keySet()) {
+			if (o1.contains(itp)) {
+				for (PointUnit itp2 : cstMap.get(itp)) {
+					if (o2.contains(itp2)) return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public void OnChange(UnitChangeArgs e) {

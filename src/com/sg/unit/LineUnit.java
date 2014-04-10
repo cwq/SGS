@@ -6,8 +6,9 @@ import android.graphics.Canvas;
 
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
+import com.sg.object.Point;
+import com.sg.object.SGObject;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
@@ -47,6 +48,11 @@ public class LineUnit extends BaseUnit implements IChangable {
 		this.end2.Set(end2);
 	}
 	
+	public boolean contains(SGObject object) {
+		return super.contains(object)
+				|| end1.contains(object) || end2.contains(object);
+	}
+	
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
 		// TODO Auto-generated method stub
@@ -56,9 +62,9 @@ public class LineUnit extends BaseUnit implements IChangable {
 	}
 	
 	@Override
-	public boolean isInUnit(Point point) {
+	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
-		if (end1.isInUnit(point) || end2.isInUnit(point)) {
+		if (end1.isInObject(point) || end2.isInObject(point)) {
 			return true;
 		}
 		double checkdistance1 = CommonFunction.distance(end1.toPoint(), point);

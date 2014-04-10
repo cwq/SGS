@@ -3,6 +3,7 @@ package com.sg.graph;
 import com.sg.constraint.CstPointsSamePos;
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
+import com.sg.object.SGObject;
 import com.sg.property.common.CommonFunction;
 import com.sg.unit.LineUnit;
 import com.sg.unit.PointUnit;
@@ -58,6 +59,13 @@ public class TriangleGraph extends BaseGraph implements IChangable{
 	public void OnChange(UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		notifies(e.Next(this));
+	}
+	
+	public boolean contains(SGObject object) {
+		return super.contains(object)
+				|| edge1.contains(object)
+				|| edge2.contains(object)
+				|| edge3.contains(object);
 	}
 
 	public void setPoint1(PointUnit point1) {

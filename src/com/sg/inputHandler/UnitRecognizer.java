@@ -1,15 +1,14 @@
 package com.sg.inputHandler;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import android.net.NetworkInfo.State;
 import android.util.Log;
 
+import com.sg.constraint.ConstraintHandler;
 import com.sg.constraint.CstPointsSamePos;
 import com.sg.controller.UnitController;
+import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.unit.BaseUnit;
 import com.sg.unit.CurveUnit;
@@ -54,6 +53,9 @@ public class UnitRecognizer {
 				//识别直线
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
 				UnitController.getInstance().addUnit(lastUnit);
+				
+				//识别第一个点的约束
+				ConstraintHandler.constraintRecognize(((LineUnit) lastUnit).getEnd1());
 			} else {
 				//识别曲线
 				lastUnit = new CurveUnit();
@@ -70,6 +72,10 @@ public class UnitRecognizer {
 			//折线
 			for (int i = 0; i < ins.size() - 1; i++) {
 				LineUnit temp = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
+				if (i == 0) {
+					//识别第一个点的约束
+					ConstraintHandler.constraintRecognize(temp.getEnd1());
+				}
 				if (i > 0) {
 					//添加约束
 					CstPointsSamePos.Add(((LineUnit) lastUnit).getEnd2(), temp.getEnd1());

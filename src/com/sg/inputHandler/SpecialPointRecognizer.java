@@ -1,13 +1,12 @@
 package com.sg.inputHandler;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import android.util.Log;
 
+import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 
 /**

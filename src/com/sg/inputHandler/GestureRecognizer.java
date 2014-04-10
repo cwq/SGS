@@ -2,8 +2,8 @@ package com.sg.inputHandler;
 
 import java.util.List;
 import com.sg.controller.UnitController;
+import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.unit.BaseUnit;
 import com.sg.unit.LineUnit;
@@ -43,10 +43,10 @@ public class GestureRecognizer {
 			LineUnit line = (LineUnit) select;
 			if (whichPoint == 0) {
 				//第一次识别是否选中点
-				if (line.getEnd1().isInUnit(pList.get(0))) {
+				if (line.getEnd1().isInObject(pList.get(0))) {
 					whichPoint = 1;
 				}
-				else if (line.getEnd2().isInUnit(pList.get(0))) {
+				else if (line.getEnd2().isInObject(pList.get(0))) {
 					whichPoint = 2;
 				} else {
 					whichPoint = 3;

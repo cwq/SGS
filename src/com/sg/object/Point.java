@@ -1,4 +1,4 @@
-package com.sg.property.common;
+package com.sg.object;
 
 public class Point {
 

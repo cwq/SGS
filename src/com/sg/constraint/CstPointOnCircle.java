@@ -6,8 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.sg.graph.CircleGraph;
+import com.sg.object.Point;
+import com.sg.object.SGObject;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.unit.PointUnit;
 
 public class CstPointOnCircle extends BaseConstraint {
@@ -42,6 +43,23 @@ public class CstPointOnCircle extends BaseConstraint {
 		
 		c.addUnitListener(CstPointOnCircle.getInstance());
 		p.addUnitListener(CstPointOnCircle.getInstance());
+	}
+
+	public static boolean isRelated(SGObject o1, SGObject o2) {
+		for (CircleGraph itc : cstMap.keySet()) {
+			if (itc.contains(o1)) {
+				for (PointUnit itp : cstMap.get(itc)) {
+					if (o2.contains(itp)) return true;
+				}
+				break;
+			} else if (itc.contains(o2)) {
+				for (PointUnit itp : cstMap.get(itc)) {
+					if (o1.contains(itp)) return true;
+				}
+				break;
+			}
+		}
+		return false;
 	}
 
 	public void OnChange(UnitChangeArgs e) {

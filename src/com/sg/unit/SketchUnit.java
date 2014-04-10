@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Canvas;
 
+import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
@@ -52,7 +52,7 @@ public class SketchUnit extends BaseUnit {
 	}
 
 	@Override
-	public boolean isInUnit(Point point) {
+	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
 		double curDistance;
 		for(Point pt : pList) {

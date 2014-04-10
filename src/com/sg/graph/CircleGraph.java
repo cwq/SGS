@@ -2,7 +2,8 @@ package com.sg.graph;
 
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
-import com.sg.property.common.Point;
+import com.sg.object.Point;
+import com.sg.object.SGObject;
 import com.sg.unit.*;
 
 public class CircleGraph extends BaseGraph implements IChangable{
@@ -23,6 +24,11 @@ public class CircleGraph extends BaseGraph implements IChangable{
 	
 	public void setRadius(double radius) {
 		curveUnit.setAB(radius, radius);
+	}
+	
+	public boolean contains(SGObject object) {
+		return super.contains(object)
+				|| curveUnit.contains(object);
 	}
 
 	@Override

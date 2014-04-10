@@ -1,10 +1,10 @@
 package com.sg.constraint;
 
 import java.util.HashMap;
-
 import com.sg.graph.*;
+import com.sg.object.Point;
+import com.sg.object.SGObject;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 
 public class CstCircleInTriangle extends BaseConstraint {
 	
@@ -27,6 +27,15 @@ public class CstCircleInTriangle extends BaseConstraint {
         c.addUnitListener(CstCircleInTriangle.getInstance());
         t.addUnitListener(CstCircleInTriangle.getInstance());
     }
+
+	public static boolean isRelated(SGObject o1, SGObject o2) {
+		for (CircleGraph itc : cstMap.keySet()) {
+			if ((itc.contains(o1) && cstMap.get(itc).contains(o2))
+					|| (itc.contains(o2) && cstMap.get(itc).contains(o1)))
+				return true;
+		}
+		return false;
+	}
 
     public void OnChange(UnitChangeArgs e)
     {

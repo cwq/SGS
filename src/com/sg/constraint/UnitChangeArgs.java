@@ -4,40 +4,39 @@ import java.util.ArrayList;
 import java.util.EventObject;
 import java.util.List;
 
-import com.sg.unit.BaseUnit;
-import com.sg.unit.SGEventObject;
+import com.sg.object.SGObject;
 
 public class UnitChangeArgs extends EventObject {
 
 	private static final long serialVersionUID = 1L;
 	private float preValue;
 	private float preValue2;
-	private List<SGEventObject> unitsPass;
+	private List<SGObject> unitsPass;
 	private boolean handled;
 	
-	public UnitChangeArgs(SGEventObject source, float preValue, float preValue2) {
+	public UnitChangeArgs(SGObject source, float preValue, float preValue2) {
 		super(source);
-		unitsPass = new ArrayList<SGEventObject>();
+		unitsPass = new ArrayList<SGObject>();
 		unitsPass.add(source);
 		this.setPreValue(preValue);
 		this.setPreValue2(preValue2);
 		this.setHandled(false);
 	}
 	
-	public UnitChangeArgs Next(SGEventObject cur) {
+	public UnitChangeArgs Next(SGObject cur) {
 		unitsPass.add(cur);
 		return this;
 	}
 	
-	public boolean constains(SGEventObject u) {
+	public boolean constains(SGObject u) {
 		return unitsPass.contains(u);
 	}
 	
-	public SGEventObject getSource() {
+	public SGObject getSource() {
 		return unitsPass.get(unitsPass.size() - 1);
 	}
 	
-	public SGEventObject getOrginSource() {
+	public SGObject getOrginSource() {
 		return unitsPass.get(0);
 	}
 
@@ -65,7 +64,7 @@ public class UnitChangeArgs extends EventObject {
 		this.handled = handled;
 	}
 
-	public List<SGEventObject> getUnitsPass() {
+	public List<SGObject> getUnitsPass() {
 		return unitsPass;
 	}
 

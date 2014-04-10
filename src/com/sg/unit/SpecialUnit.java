@@ -4,7 +4,7 @@ import java.util.List;
 
 import android.graphics.Canvas;
 
-import com.sg.property.common.Point;
+import com.sg.object.Point;
 import com.sg.property.tools.Painter;
 
 public class SpecialUnit extends BaseUnit {
@@ -18,7 +18,7 @@ public class SpecialUnit extends BaseUnit {
 	}
 
 	@Override
-	public boolean isInUnit(Point point) {
+	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
 		return false;
 	}

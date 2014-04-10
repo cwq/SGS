@@ -5,7 +5,7 @@ import java.util.Date;
 import java.util.List;
 import com.sg.constraint.ConstraintHandler;
 import com.sg.controller.UnitController;
-import com.sg.property.common.Point;
+import com.sg.object.Point;
 import com.sg.unit.BaseUnit;
 import com.sg.unit.SketchUnit;
 
@@ -73,7 +73,7 @@ public class StrokeCollector {
 
 				}
 				else if (null != UnitController.getInstance().getSelectUnit() && 
-						UnitController.getInstance().getSelectUnit().isInUnit(points1.get(0))) {
+						UnitController.getInstance().getSelectUnit().isInObject(points1.get(0))) {
 					Log.v("sc", "state0 : 当前有图元选中  识别手势");
 					//如果当前有图元选中  并且起 始点中选择的图元  识别手势
 					ins.recognize(points1);

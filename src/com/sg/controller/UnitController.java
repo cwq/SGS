@@ -1,6 +1,7 @@
 package com.sg.controller;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,9 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
-import com.sg.constraint.ConstraintHandler;
 import com.sg.graph.BaseGraph;
-import com.sg.property.common.Point;
+import com.sg.object.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 import com.sg.unit.BaseUnit;
@@ -84,6 +84,14 @@ public class UnitController {
 		return units;
 	}
 	
+	public Collection<BaseUnit> getUnitSet() {
+		return units.values();
+	}
+	
+	public Collection<BaseGraph> getGraphSet() {
+		return graphs;
+	}
+	
 	public boolean selectUnit(Point p) {
 		Iterator<Long> iter = units.keySet().iterator();
 		BaseUnit u;
@@ -93,7 +101,7 @@ public class UnitController {
 			if(units.containsKey(key)) {
 				u = units.get(key);
 				if (u != null && u != drawingSketch) {
-					if(u.isInUnit(p)) {
+					if(u.isInObject(p)) {
 						setSelectUnit(u);
 						return true;
 					}

@@ -1,12 +1,10 @@
 package com.sg.unit;
 
-import android.R.string;
 import android.graphics.Canvas;
 
-import com.sg.constraint.ConstraintHandler;
 import com.sg.constraint.UnitChangeArgs;
+import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
@@ -92,7 +90,7 @@ public class PointUnit extends BaseUnit {
 	}
 
 	@Override
-	public boolean isInUnit(Point point) {
+	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
 		double curDistance = CommonFunction.distance(new Point(X, Y), point);
 		if(curDistance < ThresholdProperty.GRAPH_CHECKED_DISTANCE){

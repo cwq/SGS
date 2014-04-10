@@ -7,8 +7,9 @@ import android.graphics.Path;
 
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
+import com.sg.object.Point;
+import com.sg.object.SGObject;
 import com.sg.property.common.CommonFunction;
-import com.sg.property.common.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 
@@ -323,9 +324,13 @@ public class CurveUnit extends BaseUnit implements IChangable {
     }
     
 	@Override
-	public boolean isInUnit(Point point) {
+	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	public boolean contains(SGObject object) {
+		return super.contains(object) || this.center.contains(object);
 	}
 
 	public void setAB(double a, double b, UnitChangeArgs e) {

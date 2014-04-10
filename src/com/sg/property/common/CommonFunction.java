@@ -1,5 +1,7 @@
 package com.sg.property.common;
 
+import com.sg.object.Point;
+
 public class CommonFunction {
 	
 	/**

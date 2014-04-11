@@ -13,16 +13,17 @@ public class ConstraintHandler {
 
 	/**
 	 * 识别约束
-	 * @param u
+	 * @param u 仅为了识别画直线时第一个点元的约束才传入PointUnit
 	 */
 	static public void constraintRecognize(BaseUnit u) {
 		if (u instanceof PointUnit) {
+			//仅为了识别画直线时第一个点元的约束
 			PointUnit pointUnit = (PointUnit) u;
 			for (BaseUnit unit : UnitController.getInstance().getUnits().values()) {
 				if (unit instanceof LineUnit && !unit.contains(pointUnit)) {
 					//识别线和线
 					LineUnit temp = (LineUnit) unit;
-					pointToLine(pointUnit, temp);
+					pointToLine(pointUnit, temp, null);
 				}
 			}
 		}
@@ -36,35 +37,90 @@ public class ConstraintHandler {
 					//识别线和圆
 				}
 			}
+			
+			//找到所有与curLine一端相连的线的另一个端点
+			Set<PointUnit> linkPointUnits1 = getLinkPointUnits(curLine.getEnd1());
+			Set<PointUnit> linkPointUnits2 = getLinkPointUnits(curLine.getEnd2());
+			
 			for (BaseUnit unit : UnitController.getInstance().getUnits().values()) {
 				if (unit instanceof LineUnit && unit != curLine) {
 					//识别线和线
 					LineUnit temp = (LineUnit) unit;
-					//如果已经有一点约束则不识别 避免重叠成一条线
-					if (CstPointsSamePos.isRelated(temp, curLine)) continue;
 					
-					if (pointToLine(curLine.getEnd1(), temp)) continue;
-					if (pointToLine(curLine.getEnd2(), temp)) continue;
+					if (pointToLine(curLine.getEnd1(), temp, linkPointUnits1)) continue;
+					if (pointToLine(curLine.getEnd2(), temp, linkPointUnits2)) continue;
 				}
 			}
 		}
 	}
 	
 	/**
-	 * 识别pointUnit与lineUnit端点是否重合约束
-	 * @param pointUnit
-	 * @param lineUnit
+	 * 找到所有与curPointUnit相连的线的端点, 如curLine（a,b）,有线(c,d),(e,f)与之相连(ac重合,de重合)则返回c,d,e
+	 * @param curPointUnit
 	 * @return
 	 */
-	static private boolean pointToLine(PointUnit pointUnit, LineUnit lineUnit) {
-		if (CommonFunction.distance(pointUnit.toPoint(),
-				lineUnit.getEnd1().toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
+	static private Set<PointUnit> getLinkPointUnits(PointUnit curPointUnit) {
+		Set<PointUnit> linkPointUnits = new HashSet<PointUnit>();
+		
+		Set<PointUnit> tempSet = new HashSet<PointUnit>();
+		tempSet.add(curPointUnit);
+		if (CstPointsSamePos.cstMap.get(curPointUnit) != null) {
+			tempSet.addAll(CstPointsSamePos.cstMap.get(curPointUnit));
+		}
+		
+		linkPointUnits.addAll(tempSet);
+		
+		addPoinUnit(linkPointUnits, tempSet, 1);
+		
+		return linkPointUnits;
+	}
+	
+	static private void addPoinUnit(Set<PointUnit> linkPointUnits, Set<PointUnit> tempSet, int level) {
+		for (BaseUnit unit : UnitController.getInstance().getUnits().values()) {
+			if (unit instanceof LineUnit) {
+				LineUnit temp = (LineUnit) unit;
+				//如果getEnd1与curLine的端点约束
+				if (tempSet.contains(temp.getEnd1())) {
+					linkPointUnits.add(temp.getEnd2());
+					if (CstPointsSamePos.cstMap.get(temp.getEnd2()) != null) {
+						linkPointUnits.addAll(CstPointsSamePos.cstMap.get(temp.getEnd2()));
+						if (level < 2) {
+							addPoinUnit(linkPointUnits, CstPointsSamePos.cstMap.get(temp.getEnd2()), level+1);
+						}
+					}
+				}
+				//如果getEnd2与curLine的端点约束
+				if (tempSet.contains(temp.getEnd2())) {
+					linkPointUnits.add(temp.getEnd1());
+					if (CstPointsSamePos.cstMap.get(temp.getEnd1()) != null) {
+						linkPointUnits.addAll(CstPointsSamePos.cstMap.get(temp.getEnd1()));
+						if (level < 2) {
+							addPoinUnit(linkPointUnits, CstPointsSamePos.cstMap.get(temp.getEnd1()), level + 1);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 识别pointUnit与lineUnit端点是否约束，并且lineUnit端点不在pSet内
+	 * @param pointUnit
+	 * @param lineUnit
+	 * @param pSet
+	 * @return
+	 */
+	static private boolean pointToLine(PointUnit pointUnit, LineUnit lineUnit, Set<PointUnit> linkPointUnits) {
+		if (CommonFunction.distance(pointUnit.toPoint(), lineUnit.getEnd1()
+				.toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED
+				&& (linkPointUnits == null || !linkPointUnits.contains(lineUnit.getEnd1()))) {
 			pointUnit.Set(lineUnit.getEnd1());
 			CstPointsSamePos.Add(pointUnit, lineUnit.getEnd1());
 			return true;
 		}
-		if (CommonFunction.distance(pointUnit.toPoint(),
-				lineUnit.getEnd2().toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
+		if (CommonFunction.distance(pointUnit.toPoint(), lineUnit.getEnd2()
+				.toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED
+				&& (linkPointUnits == null || !linkPointUnits.contains(lineUnit.getEnd2()))) {
 			pointUnit.Set(lineUnit.getEnd2());
 			CstPointsSamePos.Add(pointUnit, lineUnit.getEnd2());
 			return true;

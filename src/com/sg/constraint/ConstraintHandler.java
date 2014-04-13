@@ -16,6 +16,9 @@ public class ConstraintHandler {
 	 * @param u
 	 */
 	static public void constraintRecognize(BaseUnit u) {
+		if (u == null) {
+			return;
+		}
 		if (u instanceof LineUnit) {
 			LineUnit curLine = (LineUnit) u;
 			for (BaseGraph graph : UnitController.getInstance().getGraphSet()) {

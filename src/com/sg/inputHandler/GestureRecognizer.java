@@ -24,6 +24,11 @@ public class GestureRecognizer {
 	 */
 	private int whichPoint = 0;
 	
+	/**
+	 * 是否为双点手势，为处理双点手势弹起，双点手势move过程不能直接进入单点手势
+	 */
+	private boolean isDouble = false;
+	
 	public static GestureRecognizer getInstance() {
 		return instance;
 	}
@@ -37,6 +42,9 @@ public class GestureRecognizer {
 	 * @param p1
 	 */
 	public void recognize(List<Point> pList) {
+		if (isDouble) {
+			return;
+		}
 		int size = pList.size();
 		BaseUnit select = UnitController.getInstance().getSelectUnit();
 		if (select instanceof LineUnit) {
@@ -72,7 +80,7 @@ public class GestureRecognizer {
 	}
 	
 	public void recognize(Point p1, Point p2) {
-		
+		isDouble = true;
 	}
 	
 	public boolean isSelectUnit(List<Point> pList) {
@@ -93,8 +101,12 @@ public class GestureRecognizer {
 		}
 	}
 
-	public void setWhichPoint(int whichPoint) {
-		this.whichPoint = whichPoint;
+	/**
+	 * 在up后执行  清楚一些数据记录
+	 */
+	public void init() {
+		whichPoint = 0;
+		isDouble = false;
 	}
 
 }

@@ -121,8 +121,7 @@ public class StrokeCollector {
 		case MotionEvent.ACTION_UP:
 			Log.v("sc", "up1");
 			
-			//手势识别中whichPoint设置为0:还未识别是否点中点元
-			GestureRecognizer.getInstance().setWhichPoint(0);
+			GestureRecognizer.getInstance().init();
 			
 			BaseUnit curUnit;
 			//图元识别

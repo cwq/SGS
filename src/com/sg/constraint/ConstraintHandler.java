@@ -36,8 +36,18 @@ public class ConstraintHandler {
 					//识别线和线
 					LineUnit temp = (LineUnit) unit;
 					
-					if (pointToLine(curLine.getEnd1(), temp, linkPointUnits1)) continue;
-					if (pointToLine(curLine.getEnd2(), temp, linkPointUnits2)) continue;
+					if (pointToLine(curLine.getEnd1(), temp, linkPointUnits1)) {
+						//如果有新的约束 则要更新相连的点链表
+						linkPointUnits1 = getLinkPointUnits(curLine.getEnd1());
+						linkPointUnits2 = getLinkPointUnits(curLine.getEnd2());
+						continue;
+					}
+					if (pointToLine(curLine.getEnd2(), temp, linkPointUnits2)) {
+						//如果有新的约束 则要更新相连的点链表
+						linkPointUnits1 = getLinkPointUnits(curLine.getEnd1());
+						linkPointUnits2 = getLinkPointUnits(curLine.getEnd2());
+						continue;
+					}
 				}
 			}
 		}

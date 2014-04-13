@@ -54,8 +54,8 @@ public class UnitRecognizer {
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
 				UnitController.getInstance().addUnit(lastUnit);
 				
-				//识别第一个点的约束
-				ConstraintHandler.constraintRecognize(((LineUnit) lastUnit).getEnd1());
+//				//识别第一个点的约束
+//				ConstraintHandler.constraintRecognize(((LineUnit) lastUnit).getEnd1());
 			} else {
 				//识别曲线
 				lastUnit = new CurveUnit();
@@ -72,14 +72,14 @@ public class UnitRecognizer {
 			//折线
 			for (int i = 0; i < ins.size() - 1; i++) {
 				LineUnit temp = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
-				if (i == 0) {
-					//识别第一个点的约束
-					ConstraintHandler.constraintRecognize(temp.getEnd1());
-				}
-				if (i > 0) {
-					//添加约束
-					CstPointsSamePos.Add(((LineUnit) lastUnit).getEnd2(), temp.getEnd1());
-				}
+//				if (i == 0) {
+//					//识别第一个点的约束
+//					ConstraintHandler.constraintRecognize(temp.getEnd1());
+//				}
+//				if (i > 0) {
+//					//添加约束
+//					CstPointsSamePos.Add(((LineUnit) lastUnit).getEnd2(), temp.getEnd1());
+//				}
 				lastUnit = temp;
 				UnitController.getInstance().addUnit(lastUnit);
 			}
@@ -131,8 +131,8 @@ public class UnitRecognizer {
 				
 				lastUnit = new LineUnit(temp.getEnd2().toPoint(), p);
 				UnitController.getInstance().addUnit(lastUnit);
-				//添加约束
-				CstPointsSamePos.Add(temp.getEnd2(), ((LineUnit) lastUnit).getEnd1());
+//				//添加约束
+//				CstPointsSamePos.Add(temp.getEnd2(), ((LineUnit) lastUnit).getEnd1());
 				
 			} else {
 				((LineUnit) lastUnit).setEnd2(new PointUnit(p));

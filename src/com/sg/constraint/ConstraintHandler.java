@@ -13,20 +13,9 @@ public class ConstraintHandler {
 
 	/**
 	 * 识别约束
-	 * @param u 仅为了识别画直线时第一个点元的约束才传入PointUnit
+	 * @param u
 	 */
 	static public void constraintRecognize(BaseUnit u) {
-		if (u instanceof PointUnit) {
-			//仅为了识别画直线时第一个点元的约束
-			PointUnit pointUnit = (PointUnit) u;
-			for (BaseUnit unit : UnitController.getInstance().getUnits().values()) {
-				if (unit instanceof LineUnit && !unit.contains(pointUnit)) {
-					//识别线和线
-					LineUnit temp = (LineUnit) unit;
-					pointToLine(pointUnit, temp, null);
-				}
-			}
-		}
 		if (u instanceof LineUnit) {
 			LineUnit curLine = (LineUnit) u;
 			for (BaseGraph graph : UnitController.getInstance().getGraphSet()) {
@@ -55,7 +44,7 @@ public class ConstraintHandler {
 	}
 	
 	/**
-	 * 找到所有与curPointUnit相连的线的端点, 如curLine（a,b）,有线(c,d),(e,f)与之相连(ac重合,de重合)则返回c,d,e
+	 * 找到所有与curPointUnit相连的线的端点, 如curLine（a,b）,有线(c,d),(e,f)与之相连(ac重合,de重合)则返回a,c,d,e
 	 * @param curPointUnit
 	 * @return
 	 */

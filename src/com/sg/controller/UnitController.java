@@ -9,11 +9,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 
+import com.sg.constraint.ConstraintHandler;
 import com.sg.graph.BaseGraph;
 import com.sg.object.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 import com.sg.unit.BaseUnit;
+import com.sg.unit.LineUnit;
 import com.sg.unit.SketchUnit;
 
 public class UnitController {
@@ -46,6 +48,9 @@ public class UnitController {
 	
 	public void addUnit(BaseUnit u) {
 		units.put(u.getID(), u);
+		if (u instanceof LineUnit) {
+			ConstraintHandler.constraintRecognize(u);
+		}
 	}
 	
 	public void addGraph(BaseGraph g) {

@@ -23,6 +23,13 @@ public class CstPointsSamePos extends BaseConstraint {
 	public static void Add(PointUnit a, PointUnit b) {
 		if (cstMap.get(a) == null) cstMap.put(a, new HashSet<PointUnit>());
 		if (cstMap.get(b) == null) cstMap.put(b, new HashSet<PointUnit>());
+		// a原来就与其他点有约束
+		if (!cstMap.get(a).isEmpty()) {
+			cstMap.get(b).addAll(cstMap.get(a));
+			for (PointUnit pUnit : cstMap.get(a)) {
+				cstMap.get(pUnit).add(b);
+			}
+		}
 		cstMap.get(a).add(b);
 		cstMap.get(b).add(a);
 		a.addUnitListener(CstPointsSamePos.getInstance());

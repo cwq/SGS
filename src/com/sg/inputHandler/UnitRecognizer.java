@@ -163,6 +163,13 @@ public class UnitRecognizer {
 		if (state == 0) {
 			recognizeFirstPart(points);
 		}
+		//如果直线太短 忽略
+		if (lastUnit instanceof LineUnit) {
+			if (CommonFunction.distance(((LineUnit) lastUnit).getEnd1()
+					.toPoint(), ((LineUnit) lastUnit).getEnd2().toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
+				UnitController.getInstance().deleteUnit(lastUnit);
+			}
+		}
 		//草图
 		if (lastUnit == null) {
 			SketchUnit sketchUnit =  new SketchUnit();

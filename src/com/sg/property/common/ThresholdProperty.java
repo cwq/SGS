@@ -16,8 +16,7 @@ public class ThresholdProperty {
 	public static double JUDGE_LINE_VALUE;
 	
 	//时间
-	public static int PRESS_TIME_SHORT;
-	public static int PRESS_TIME_LONG;
+	public static int PRESS_TIME = 500;
 	
 	//图形选中
 	public static double GRAPH_CHECKED_DISTANCE;
@@ -45,13 +44,13 @@ public class ThresholdProperty {
 	
 	public static double FLOAT_OFFSET = 1e-10;
 	
+	public static double CIRCLE_JUDE = 1.5;
+	
 	public static void set(float density, int width) {
 		POINT_COUNT = 20;
 		POINT_DISTANCE = 8 * density;
 		POINT_SELECTED_DISTANCE = 20 * density;
 		JUDGE_LINE_VALUE = 0.98;
-		PRESS_TIME_SHORT = 200;
-		PRESS_TIME_LONG = 1000;
 		GRAPH_CHECKED_DISTANCE = 30 * density;
 		TWO_POINT_IS_CLOSED = 50 * density;
 		TWO_POINT_IS_CONSTRAINTED = 30 * density;

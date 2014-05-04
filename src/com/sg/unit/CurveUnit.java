@@ -418,5 +418,20 @@ public class CurveUnit extends BaseUnit implements IChangable {
 		// TODO Auto-generated method stub
 		this.rotateAngle = this.rotateAngle + rotateAngle;
 	}
+	
+	/**
+	 * 判断是否为圆
+	 * @return
+	 */
+	public boolean isCircle() {
+        double circleJude = ThresholdProperty.CIRCLE_JUDE;
+		double kk = this.a / this.b;
+        if (kk > 1.0/circleJude && kk < circleJude) {
+        	kk = (this.a + this.b) / 2;
+        	this.a = this.b = kk;
+        	return true;
+        }
+		return false;
+	}
 
 }

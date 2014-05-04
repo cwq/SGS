@@ -6,6 +6,7 @@ import java.util.List;
 import com.sg.constraint.ConstraintHandler;
 import com.sg.controller.UnitController;
 import com.sg.object.Point;
+import com.sg.property.common.ThresholdProperty;
 import com.sg.unit.BaseUnit;
 import com.sg.unit.SketchUnit;
 
@@ -24,7 +25,7 @@ public class StrokeCollector {
 	private List<Point> points2;
 	private SketchUnit drawingSketch;
 	private long downTime;
-	private long TIME = 500;
+	private long TIME = ThresholdProperty.PRESS_TIME;
 	private int state;
 	
 	public StrokeCollector() {

@@ -1,9 +1,7 @@
 package com.sg.controller;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.Canvas;
@@ -11,10 +9,12 @@ import android.graphics.Color;
 
 import com.sg.constraint.ConstraintHandler;
 import com.sg.graph.BaseGraph;
+import com.sg.graph.CircleGraph;
 import com.sg.object.Point;
 import com.sg.property.common.ThresholdProperty;
 import com.sg.property.tools.Painter;
 import com.sg.unit.BaseUnit;
+import com.sg.unit.CurveUnit;
 import com.sg.unit.LineUnit;
 import com.sg.unit.SketchUnit;
 
@@ -24,18 +24,22 @@ public class UnitController {
 	
 	private ConcurrentHashMap<Long, BaseUnit> units;
 	
-	private List<BaseGraph> graphs;
+	private ConcurrentHashMap<String, BaseGraph> graphs;
 	
+	//选择的单个图元
 	private BaseUnit selectUnit;
-	
+	//画图过程的草图
 	private SketchUnit drawingSketch;
+	//变画边识别的图元 还未添加到units
+	private BaseUnit preViewUnit;
 	
 	private Painter painter;
 	private Painter checkedPainter;
 	
 	private UnitController() {
 		units = new ConcurrentHashMap<Long, BaseUnit>();
-		graphs = new ArrayList<BaseGraph>();
+		graphs = new ConcurrentHashMap<String, BaseGraph>();
+		preViewUnit = null;
 		drawingSketch = new SketchUnit();
 		units.put(drawingSketch.getID(), drawingSketch);
 		painter = new Painter(Color.BLACK, ThresholdProperty.DRAW_WIDTH);
@@ -51,10 +55,19 @@ public class UnitController {
 		if (u instanceof LineUnit) {
 			ConstraintHandler.constraintRecognize(u);
 		}
+		if (u instanceof CurveUnit) {
+			if (((CurveUnit) u).isCircle()) {
+				CircleGraph circleGraph = new CircleGraph((CurveUnit) u);
+				addGraph(circleGraph);
+				ConstraintHandler.constraintRecognize(circleGraph);
+			}
+		}
 	}
 	
 	public void addGraph(BaseGraph g) {
-		graphs.add(g);
+		if (!graphs.containsKey(g.getKey())) {
+			graphs.put(g.getKey(), g);
+		}
 	}
 	
 	public void deleteUnit(BaseUnit u) {
@@ -70,6 +83,7 @@ public class UnitController {
 		drawingSketch.clear();
 		units.put(drawingSketch.getID(), drawingSketch);
 		selectUnit = null;
+		preViewUnit = null;
 		graphs.clear();
 	}
 	
@@ -85,6 +99,14 @@ public class UnitController {
 		return drawingSketch;
 	}
 	
+	public synchronized void setPreViewUnit(BaseUnit preViewUnit) {
+		this.preViewUnit = preViewUnit;
+	}
+	
+	public BaseUnit getPreViewUnit() {
+		return preViewUnit;
+	}
+	
 	public ConcurrentHashMap<Long, BaseUnit> getUnits() {
 		return units;
 	}
@@ -94,7 +116,7 @@ public class UnitController {
 	}
 	
 	public Collection<BaseGraph> getGraphSet() {
-		return graphs;
+		return graphs.values();
 	}
 	
 	public boolean selectUnit(Point p) {
@@ -133,11 +155,20 @@ public class UnitController {
 //			}
 //		}
 		//drawingSketch.draw(canvas, painter);
+		synchronized (this) {
+			if (preViewUnit != null) {
+				preViewUnit.draw(canvas, painter);
+			}
+		}
+		
 		for (BaseUnit u : units.values()) {
-			if(u == selectUnit)
-				u.draw(canvas, checkedPainter);
-			else
-				u.draw(canvas, painter);
+			if (u != null) {
+				if (u == selectUnit)
+					u.draw(canvas, checkedPainter);
+				else
+					u.draw(canvas, painter);
+			}
+			
 		}
 	}
 }

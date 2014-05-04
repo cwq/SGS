@@ -4,8 +4,6 @@ import java.util.List;
 
 import android.util.Log;
 
-import com.sg.constraint.ConstraintHandler;
-import com.sg.constraint.CstPointsSamePos;
 import com.sg.controller.UnitController;
 import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
@@ -52,7 +50,9 @@ public class UnitRecognizer {
 			if (((LineUnit) (new LineUnit())).Adapt(points)) {
 				//识别直线
 				lastUnit = new LineUnit(points.get(ins.get(0)), points.get(ins.get(1)));
-				UnitController.getInstance().addUnit(lastUnit);
+//				UnitController.getInstance().addUnit(lastUnit);
+				//预览图
+				UnitController.getInstance().setPreViewUnit(lastUnit);
 				
 //				//识别第一个点的约束
 //				ConstraintHandler.constraintRecognize(((LineUnit) lastUnit).getEnd1());
@@ -60,7 +60,9 @@ public class UnitRecognizer {
 				//识别曲线
 				lastUnit = new CurveUnit();
 				if(((CurveUnit)lastUnit).Adapt(points) == true) {
-					UnitController.getInstance().addUnit(lastUnit);
+//					UnitController.getInstance().addUnit(lastUnit);
+					//预览图
+					UnitController.getInstance().setPreViewUnit(lastUnit);
 				} else {
 					//草图
 					lastUnit =  null;
@@ -70,8 +72,8 @@ public class UnitRecognizer {
 		}
 		if (ins.size() > 2) {
 			//折线
-			for (int i = 0; i < ins.size() - 1; i++) {
-				LineUnit temp = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
+			for (int i = 0; i < ins.size() - 2; i++) {
+				lastUnit = new LineUnit(points.get(ins.get(i)), points.get(ins.get(i+1)));
 //				if (i == 0) {
 //					//识别第一个点的约束
 //					ConstraintHandler.constraintRecognize(temp.getEnd1());
@@ -80,9 +82,11 @@ public class UnitRecognizer {
 //					//添加约束
 //					CstPointsSamePos.Add(((LineUnit) lastUnit).getEnd2(), temp.getEnd1());
 //				}
-				lastUnit = temp;
+//				lastUnit = temp;
 				UnitController.getInstance().addUnit(lastUnit);
 			}
+			lastUnit = new LineUnit(points.get(ins.get(ins.size()-2)), points.get(ins.get(ins.size()-1)));
+			UnitController.getInstance().setPreViewUnit(lastUnit);
 		} 
 		
 	}
@@ -128,9 +132,11 @@ public class UnitRecognizer {
 			}
 			
 			if (ridian * 180.0 / Math.PI <= 150.0 && disL > ThresholdProperty.TWO_POINT_IS_CLOSED) {
-				
-				lastUnit = new LineUnit(temp.getEnd2().toPoint(), p);
 				UnitController.getInstance().addUnit(lastUnit);
+				lastUnit = new LineUnit(temp.getEnd2().toPoint(), p);
+				UnitController.getInstance().setPreViewUnit(lastUnit);
+//				lastUnit = new LineUnit(temp.getEnd2().toPoint(), p);
+//				UnitController.getInstance().addUnit(lastUnit);
 //				//添加约束
 //				CstPointsSamePos.Add(temp.getEnd2(), ((LineUnit) lastUnit).getEnd1());
 				
@@ -141,8 +147,9 @@ public class UnitRecognizer {
 		if (lastUnit instanceof CurveUnit) {
 			CurveUnit temp = (CurveUnit) lastUnit;
 			if (temp.Adapt(UnitController.getInstance().getSketchUnit().getPoints()) == false) {
-				UnitController.getInstance().deleteUnit(lastUnit);
+//				UnitController.getInstance().deleteUnit(lastUnit);
 				lastUnit = null;
+				UnitController.getInstance().setPreViewUnit(lastUnit);
 			}
 		}
 	}
@@ -167,7 +174,8 @@ public class UnitRecognizer {
 		if (lastUnit instanceof LineUnit) {
 			if (CommonFunction.distance(((LineUnit) lastUnit).getEnd1()
 					.toPoint(), ((LineUnit) lastUnit).getEnd2().toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
-				UnitController.getInstance().deleteUnit(lastUnit);
+//				UnitController.getInstance().deleteUnit(lastUnit);
+				return null;
 			}
 		}
 		//草图
@@ -176,10 +184,11 @@ public class UnitRecognizer {
 			for (int i = 0; i < n; i++) {
 				sketchUnit.addPoint(points.get(i));
 			}
-			UnitController.getInstance().addUnit(sketchUnit);
+//			UnitController.getInstance().addUnit(sketchUnit);
 			lastUnit = sketchUnit;
 		}
 
+		UnitController.getInstance().addUnit(lastUnit);
 		return lastUnit;
 	}
 	

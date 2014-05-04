@@ -1,5 +1,7 @@
 package com.sg.graph;
 
+import java.util.Arrays;
+
 import com.sg.constraint.CstPointsSamePos;
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
@@ -39,6 +41,10 @@ public class TriangleGraph extends BaseGraph implements IChangable{
 		edge1.addUnitListener(this);
 		edge2.addUnitListener(this);
 		edge3.addUnitListener(this);
+		
+		long[] lID = {l1.getID(),l2.getID(),l3.getID()};
+		Arrays.sort(lID);
+		setKey(lID[0]+","+lID[1]+","+lID[2]);
 	}
 	
 	private PointUnit nearestPoint(PointUnit p, LineUnit l1, LineUnit l2) {

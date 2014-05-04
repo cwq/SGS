@@ -15,7 +15,7 @@ public class ConstraintHandler {
 	 * 识别约束
 	 * @param u
 	 */
-	static public void constraintRecognize(BaseUnit u) {
+	static public void constraintRecognize(SGObject u) {
 		if (u == null) {
 			return;
 		}

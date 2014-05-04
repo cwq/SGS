@@ -7,6 +7,9 @@ import com.sg.object.SGObject;
 import com.sg.property.tools.Painter;
 
 public class BaseGraph extends SGObject {
+	
+	//标识图形 避免重复添加
+	private String key;
 
 	@Override
 	public void draw(Canvas canvas, Painter painter) {
@@ -36,6 +39,14 @@ public class BaseGraph extends SGObject {
 	public void rotate(double rotateAngle) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 }

@@ -400,21 +400,20 @@ public class CurveUnit extends BaseUnit implements IChangable {
 	}
 
 	@Override
-	public void translate(Point vector) {
+	public void translate(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
-		center.setX(center.getX() + vector.getX());
-		center.setY(center.getY() + vector.getY());
+		center.Set(center.getX() + vector.getX(), center.getY() + vector.getY(), e);
 	}
 
 	@Override
-	public void scale(Point vector) {
+	public void scale(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		a = a * vector.getX();
 		b = b * vector.getY();
 	}
 
 	@Override
-	public void rotate(double rotateAngle) {
+	public void rotate(double rotateAngle, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		this.rotateAngle = this.rotateAngle + rotateAngle;
 	}

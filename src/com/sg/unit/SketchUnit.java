@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import android.graphics.Canvas;
 
+import com.sg.constraint.UnitChangeArgs;
 import com.sg.object.Point;
 import com.sg.property.common.CommonFunction;
 import com.sg.property.common.ThresholdProperty;
@@ -65,19 +66,19 @@ public class SketchUnit extends BaseUnit {
 	}
 
 	@Override
-	public void translate(Point vector) {
+	public void translate(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void scale(Point vector) {
+	public void scale(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void rotate(double rotateAngle) {
+	public void rotate(double rotateAngle, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -53,11 +53,11 @@ public abstract class SGObject {
 	
 	public abstract boolean isInObject(Point point);
 	
-	public abstract void translate(Point vector);
+	public abstract void translate(Point vector, UnitChangeArgs e);
 	
-	public abstract void scale(Point vector);
+	public abstract void scale(Point vector, UnitChangeArgs e);
 	
-	public abstract void rotate(double rotateAngle);
+	public abstract void rotate(double rotateAngle, UnitChangeArgs e);
 
 	public long getGroup() {
 		return group;

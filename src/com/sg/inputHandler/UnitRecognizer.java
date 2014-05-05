@@ -154,9 +154,9 @@ public class UnitRecognizer {
 		}
 	}
 	
-	public BaseUnit recognizeUnitOnUp(List<Point> points, int state) {
+	public void recognizeUnitOnUp(List<Point> points, int state) {
 		isAdjust = false;
-		UnitController.getInstance().setSelectUnit(null);
+		UnitController.getInstance().setNoSelect();
 		int n = points.size();
 		double totalLength = 0;
 		for(int i = 0; i < n-1; i++) {
@@ -164,7 +164,7 @@ public class UnitRecognizer {
 		}
 		//画的距离太短 忽略
 		if (totalLength < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
-			return null;
+			return;
 		}
 		//时间很短
 		if (state == 0) {
@@ -175,7 +175,7 @@ public class UnitRecognizer {
 			if (CommonFunction.distance(((LineUnit) lastUnit).getEnd1()
 					.toPoint(), ((LineUnit) lastUnit).getEnd2().toPoint()) < ThresholdProperty.TWO_POINT_IS_CONSTRAINTED) {
 //				UnitController.getInstance().deleteUnit(lastUnit);
-				return null;
+				return;
 			}
 		}
 		//草图
@@ -189,7 +189,6 @@ public class UnitRecognizer {
 		}
 
 		UnitController.getInstance().addUnit(lastUnit);
-		return lastUnit;
 	}
 	
 }

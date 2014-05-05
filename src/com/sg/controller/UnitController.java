@@ -6,8 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.util.Log;
-
 import com.sg.constraint.ConstraintHandler;
 import com.sg.graph.BaseGraph;
 import com.sg.graph.CircleGraph;
@@ -27,8 +25,11 @@ public class UnitController {
 	
 	private ConcurrentHashMap<String, BaseGraph> graphs;
 	
-	//选择的单个图元
-	private BaseUnit selectUnit;
+//	//选择的单个图元
+//	private BaseUnit selectUnit;
+	
+	private ConcurrentHashMap<Long, BaseUnit> selects;
+	
 	//画图过程的草图
 	private SketchUnit drawingSketch;
 	//变画边识别的图元 还未添加到units
@@ -40,6 +41,7 @@ public class UnitController {
 	private UnitController() {
 		units = new ConcurrentHashMap<Long, BaseUnit>();
 		graphs = new ConcurrentHashMap<String, BaseGraph>();
+		selects = new ConcurrentHashMap<Long, BaseUnit>();
 		preViewUnit = null;
 		drawingSketch = new SketchUnit();
 		units.put(drawingSketch.getID(), drawingSketch);
@@ -83,18 +85,31 @@ public class UnitController {
 		units.clear();
 		drawingSketch.clear();
 		units.put(drawingSketch.getID(), drawingSketch);
-		selectUnit = null;
+//		selectUnit = null;
+		selects.clear();
 		preViewUnit = null;
 		graphs.clear();
 	}
 	
-	public BaseUnit getSelectUnit() {
-		return selectUnit;
+	public Collection<BaseUnit> getSelects() {
+		return selects.values();
 	}
-
-	public void setSelectUnit(BaseUnit selectUnit) {
-		this.selectUnit = selectUnit;
+	
+	public void addSelect(BaseUnit unit) {
+		selects.put(unit.getID(), unit);
 	}
+	
+	public void setNoSelect() {
+		selects.clear();
+	}
+	
+//	public BaseUnit getSelectUnit() {
+//		return selectUnit;
+//	}
+//
+//	public void setSelectUnit(BaseUnit selectUnit) {
+//		this.selectUnit = selectUnit;
+//	}
 	
 	public SketchUnit getSketchUnit() {
 		return drawingSketch;
@@ -120,7 +135,12 @@ public class UnitController {
 		return graphs.values();
 	}
 	
-	public boolean selectUnit(Point p) {
+	/**
+	 * 获取p点中的图元
+	 * @param p
+	 * @return
+	 */
+	private BaseUnit selectUnit(Point p) {
 		Iterator<Long> iter = units.keySet().iterator();
 		BaseUnit u;
 		Long key;
@@ -130,27 +150,36 @@ public class UnitController {
 				u = units.get(key);
 				if (u != null && u != drawingSketch) {
 					if(u.isInObject(p)) {
-						setSelectUnit(u);
-						find(u.getGroup());
-						return true;
+						return u;
 					}
 				}
 			}
 		}
+		return null;
+	}
+	
+	public boolean selectOneUnit(Point p) {
+		setNoSelect();
+		BaseUnit baseUnit = selectUnit(p);
+		if (baseUnit != null) {
+			addSelect(baseUnit);
+			return true;
+		}
 		return false;
 	}
 	
-	private void find(long group) {
-		for (BaseGraph graph : getGraphSet()) {
-			if (graph.getGroup() == group) {
-				Log.v("group", graph.getID()+"");
+	public boolean selectGroup(Point p) {
+		setNoSelect();
+		BaseUnit baseUnit = selectUnit(p);
+		if (baseUnit != null) {
+			for (BaseUnit unit : getUnitSet()) {
+				if (unit.getGroup() == baseUnit.getGroup()) {
+					addSelect(unit);
+				}
 			}
+			return true;
 		}
-		for (BaseUnit unit : getUnitSet()) {
-			if (unit.getGroup() == group) {
-				Log.v("group", unit.getID()+"");
-			}
-		}
+		return false;
 	}
 	
 	public void draw(Canvas canvas) {
@@ -178,7 +207,7 @@ public class UnitController {
 		
 		for (BaseUnit u : units.values()) {
 			if (u != null) {
-				if (u == selectUnit)
+				if (selects.containsKey(u.getID()))
 					u.draw(canvas, checkedPainter);
 				else
 					u.draw(canvas, painter);

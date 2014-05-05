@@ -3,15 +3,15 @@ package com.sg.inputHandler;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import android.util.Log;
+import android.view.MotionEvent;
+
 import com.sg.constraint.ConstraintHandler;
 import com.sg.controller.UnitController;
 import com.sg.object.Point;
 import com.sg.property.common.ThresholdProperty;
-import com.sg.unit.BaseUnit;
 import com.sg.unit.SketchUnit;
-
-import android.util.Log;
-import android.view.MotionEvent;
 
 /**
  * 触屏事件流程处理
@@ -27,6 +27,9 @@ public class StrokeCollector {
 	private long downTime;
 	private long TIME = ThresholdProperty.PRESS_TIME;
 	private int state;
+	private static final int INITIAL = 0;
+	private static final int GESTURE = 1;
+	private static final int UNIT = 2;
 	
 	public StrokeCollector() {
 		points1 = new ArrayList<Point>();
@@ -60,7 +63,7 @@ public class StrokeCollector {
 			GestureRecognizer ins = GestureRecognizer.getInstance();
 			
 			switch(state) {
-			case 0: //无特殊状态
+			case INITIAL: //无特殊状态
 
 				//多点 或者 起 始点点中选中的图元
 				if (event.getPointerCount() > 1){
@@ -73,8 +76,7 @@ public class StrokeCollector {
 					break;
 
 				}
-				else if (null != UnitController.getInstance().getSelectUnit() && 
-						UnitController.getInstance().getSelectUnit().isInObject(points1.get(0))) {
+				else if (ins.isInSelects(points1.get(0))) {
 					Log.v("sc", "state0 : 当前有图元选中  识别手势");
 					//如果当前有图元选中  并且起 始点中选择的图元  识别手势
 					ins.recognize(points1);
@@ -84,7 +86,7 @@ public class StrokeCollector {
 				else if((new Date().getTime() - downTime) > TIME) {
 					Log.v("sc", "state0 : 时间超过" + (new Date().getTime() - downTime));
 					//时间超过阀值
-					if (ins.isSelectUnit(points1)) {
+					if (ins.isSelectOneUnit(points1)) {
 						Log.v("sc", "state0 : 选中手势");
 						//识别选中手势
 						state = 1;
@@ -98,7 +100,7 @@ public class StrokeCollector {
 					}
 				}
 				break;
-			case 1: //手势识别状态
+			case GESTURE: //手势识别状态
 				drawingSketch.setPointList(new ArrayList<Point>());
 				if (event.getPointerCount() > 1){
 					Log.v("sc", "state1 : 多点为手势");
@@ -109,7 +111,7 @@ public class StrokeCollector {
 					ins.recognize(points1);
 				}
 				break;
-			case 2: //图元识别
+			case UNIT: //图元识别
 				UnitRecognizer.getInstance().recognizeUnitOnMove(movePoint);
 				//drawingSketch.setPointList(UnitRecognizer.getInstance().recognizeUnitOnMove(movePoint));
 				Log.v("sc", "state2 : 图元识别");
@@ -124,13 +126,11 @@ public class StrokeCollector {
 			
 			GestureRecognizer.getInstance().init();
 			
-			BaseUnit curUnit;
-			//图元识别
-			if (state == 0 || state == 2) {
-				curUnit = UnitRecognizer.getInstance().recognizeUnitOnUp(points1, state);
-				Log.v("sc", "up 图元识别");
+			//只有手势识别的up要识别约束
+			if (state == GESTURE) {
+				ConstraintHandler.constraintRecognize(UnitController.getInstance().getSelects());
 			} else {
-				curUnit = UnitController.getInstance().getSelectUnit();
+				UnitRecognizer.getInstance().recognizeUnitOnUp(points1, state);
 			}
 			//识别是否删除（采用android型 拖动删除）
 //			points1.clear();
@@ -139,7 +139,6 @@ public class StrokeCollector {
 //			drawingSketch.setPointList(new ArrayList<Point>());
 			state = 0;
 			//if 弹起来 {
-			ConstraintHandler.constraintRecognize(curUnit);
 		//	规整
 		//	用户意图推测
 		//}
@@ -149,14 +148,26 @@ public class StrokeCollector {
 		}
 	}
 	
+	/**
+	 * 识别选中单个图元手势
+	 * @param e
+	 */
 	public void onLongPress(MotionEvent e) {
-		//识别选中手势
 		Log.v("sc", "press: "+new Date().getTime());
 		Point p = new Point(e.getX(0), e.getY(0));
-		if(UnitController.getInstance().selectUnit(p))
+		if(UnitController.getInstance().selectOneUnit(p))
 			state = 1;
 		else
-			UnitController.getInstance().setSelectUnit(null);
+			UnitController.getInstance().setNoSelect();
+	}
+	
+	/**
+	 * 识别选中所有有约束的图元手势
+	 * @param e
+	 */
+	public void onDoubleTap(MotionEvent e) {
+		Point p = new Point(e.getX(0), e.getY(0));
+		UnitController.getInstance().selectGroup(p);
 	}
 
 }

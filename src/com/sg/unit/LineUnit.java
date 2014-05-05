@@ -125,19 +125,19 @@ public class LineUnit extends BaseUnit implements IChangable {
 	}
 	
 	@Override
-	public void translate(Point vector) {
+	public void translate(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
-		end1.translate(vector);
-		end2.translate(vector);
+		end1.translate(vector, e);
+		end2.translate(vector, e);
 	}
 	
 	@Override
-	public void scale(Point vector) {
+	public void scale(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}
 	@Override
-	public void rotate(double rotateAngle) {
+	public void rotate(double rotateAngle, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}	

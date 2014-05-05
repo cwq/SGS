@@ -101,19 +101,19 @@ public class PointUnit extends BaseUnit {
 	}
 
 	@Override
-	public void translate(Point vector) {
+	public void translate(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
-		this.Set(this.getX() + vector.getX(), this.getY() + vector.getY());
+		this.Set(this.getX() + vector.getX(), this.getY() + vector.getY(), e);
 	}
 
 	@Override
-	public void scale(Point vector) {
+	public void scale(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void rotate(double rotateAngle) {
+	public void rotate(double rotateAngle, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
 		
 	}	

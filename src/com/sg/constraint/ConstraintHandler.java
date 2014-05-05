@@ -10,14 +10,27 @@ import com.sg.unit.*;
 
 
 public class ConstraintHandler {
+	
+	/**
+	 * 识别里面所有图元的约束,移动选中图元使用
+	 * @param sgObjects
+	 */
+	public static void constraintRecognize(Collection<BaseUnit> units) {
+		for (BaseUnit baseUnit : units) {
+			if(constraintRecognize(baseUnit)) {
+				UnitController.getInstance().setNoSelect();
+			}
+		}
+	}
 
 	/**
-	 * 识别约束
+	 * 识别单个约束，添加图元使用
 	 * @param u
 	 */
-	static public void constraintRecognize(SGObject u) {
+	static public boolean constraintRecognize(SGObject u) {
+		boolean isConstraint = false;
 		if (u == null) {
-			return;
+			return isConstraint;
 		}
 		if (u instanceof LineUnit) {
 			LineUnit curLine = (LineUnit) u;
@@ -43,17 +56,21 @@ public class ConstraintHandler {
 						//如果有新的约束 则要更新相连的点链表
 						linkPointUnits1 = getLinkPointUnits(curLine.getEnd1());
 						linkPointUnits2 = getLinkPointUnits(curLine.getEnd2());
+						isConstraint = true;
 						continue;
 					}
 					if (pointToLine(curLine.getEnd2(), temp, linkPointUnits2)) {
 						//如果有新的约束 则要更新相连的点链表
 						linkPointUnits1 = getLinkPointUnits(curLine.getEnd1());
 						linkPointUnits2 = getLinkPointUnits(curLine.getEnd2());
+						isConstraint = true;
 						continue;
 					}
 				}
 			}
 		}
+		
+		return isConstraint;
 	}
 	
 	/**

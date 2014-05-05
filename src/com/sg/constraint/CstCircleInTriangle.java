@@ -26,6 +26,8 @@ public class CstCircleInTriangle extends BaseConstraint {
         cstMap.put(c, t);
         c.addUnitListener(CstCircleInTriangle.getInstance());
         t.addUnitListener(CstCircleInTriangle.getInstance());
+        
+        ConstraintHandler.union(c.getGroup(), t.getGroup());
     }
 
 	public static boolean isRelated(SGObject o1, SGObject o2) {

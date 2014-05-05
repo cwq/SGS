@@ -15,12 +15,16 @@ public abstract class SGObject {
 	static private long sid = Long.MIN_VALUE;
 	
 	private long id;
+	
+	//标识约束在一组的标号
+	private long group;
 
 	protected Set<IChangable> listener;
 	
 	public SGObject() {
 		// TODO Auto-generated constructor stub
 		this.id = sid++;
+		group = id;
 		this.listener = new HashSet<IChangable>();
 	}
 	
@@ -54,4 +58,12 @@ public abstract class SGObject {
 	public abstract void scale(Point vector);
 	
 	public abstract void rotate(double rotateAngle);
+
+	public long getGroup() {
+		return group;
+	}
+
+	public void setGroup(long group) {
+		this.group = group;
+	}
 }

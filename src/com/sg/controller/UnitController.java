@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.sg.constraint.ConstraintHandler;
 import com.sg.graph.BaseGraph;
@@ -130,12 +131,26 @@ public class UnitController {
 				if (u != null && u != drawingSketch) {
 					if(u.isInObject(p)) {
 						setSelectUnit(u);
+						find(u.getGroup());
 						return true;
 					}
 				}
 			}
 		}
 		return false;
+	}
+	
+	private void find(long group) {
+		for (BaseGraph graph : getGraphSet()) {
+			if (graph.getGroup() == group) {
+				Log.v("group", graph.getID()+"");
+			}
+		}
+		for (BaseUnit unit : getUnitSet()) {
+			if (unit.getGroup() == group) {
+				Log.v("group", unit.getID()+"");
+			}
+		}
 	}
 	
 	public void draw(Canvas canvas) {

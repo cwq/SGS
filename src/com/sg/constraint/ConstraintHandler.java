@@ -131,6 +131,26 @@ public class ConstraintHandler {
 	}
 	
 	/**
+	 * 每次添加一个约束，合并一次groupID，保证有约束的图元、图形group一致
+	 * @param group1
+	 * @param group2
+	 */
+	public static void union(long group1, long group2) {
+		if (group1 == group2) return;
+		//把所有group为group1的设置为group2
+		for (BaseGraph graph : UnitController.getInstance().getGraphSet()) {
+			if (graph.getGroup() == group1) {
+				graph.setGroup(group2);
+			}
+		}
+		for (BaseUnit unit : UnitController.getInstance().getUnitSet()) {
+			if (unit.getGroup() == group1) {
+				unit.setGroup(group2);
+			}
+		}
+	}
+	
+	/**
 	 * 获取与object相关的约束
 	 * @param object
 	 * @return

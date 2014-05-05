@@ -43,6 +43,8 @@ public class CstPointOnCircle extends BaseConstraint {
 		
 		c.addUnitListener(CstPointOnCircle.getInstance());
 		p.addUnitListener(CstPointOnCircle.getInstance());
+		
+		ConstraintHandler.union(c.getGroup(), p.getGroup());
 	}
 
 	public static boolean isRelated(SGObject o1, SGObject o2) {

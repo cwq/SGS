@@ -13,6 +13,7 @@ public class CircleGraph extends BaseGraph implements IChangable{
 	public CircleGraph(CurveUnit curveUnit) {
 		this.curveUnit = curveUnit;
 		setKey(String.valueOf(curveUnit.getID()));
+		setGroup(curveUnit.getGroup());
 	}
 	
 	public PointUnit getCenter() {

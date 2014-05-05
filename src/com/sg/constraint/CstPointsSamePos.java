@@ -34,6 +34,8 @@ public class CstPointsSamePos extends BaseConstraint {
 		cstMap.get(b).add(a);
 		a.addUnitListener(CstPointsSamePos.getInstance());
 		b.addUnitListener(CstPointsSamePos.getInstance());
+		
+		ConstraintHandler.union(a.getGroup(), b.getGroup());
 	}
 
 	public static boolean isRelated(SGObject o1, SGObject o2) {

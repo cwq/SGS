@@ -34,9 +34,9 @@ public class TriangleGraph extends BaseGraph implements IChangable{
 		if (d1 < d2) point3 = l2.getEnd2();
 		else point3 = l2.getEnd1();
 
-		CstPointsSamePos.Add(point1, nearestPoint(point1, edge2, edge3));
-		CstPointsSamePos.Add(point2, nearestPoint(point2, edge2, edge3));
-		CstPointsSamePos.Add(point3, nearestPoint(point1, edge1, edge3));
+//		CstPointsSamePos.Add(point1, nearestPoint(point1, edge2, edge3));
+//		CstPointsSamePos.Add(point2, nearestPoint(point2, edge2, edge3));
+//		CstPointsSamePos.Add(point3, nearestPoint(point1, edge1, edge3));
 		
 		edge1.addUnitListener(this);
 		edge2.addUnitListener(this);
@@ -45,6 +45,8 @@ public class TriangleGraph extends BaseGraph implements IChangable{
 		long[] lID = {l1.getID(),l2.getID(),l3.getID()};
 		Arrays.sort(lID);
 		setKey(lID[0]+","+lID[1]+","+lID[2]);
+		
+		setGroup(edge1.getGroup());
 	}
 	
 	private PointUnit nearestPoint(PointUnit p, LineUnit l1, LineUnit l2) {

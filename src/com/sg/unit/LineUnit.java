@@ -26,6 +26,17 @@ public class LineUnit extends BaseUnit implements IChangable {
 		this.end2 = new PointUnit(p2);
 		this.end1.addUnitListener(this);
 		this.end2.addUnitListener(this);
+		//端点的groupid和线元相同
+		end1.setGroup(this.getGroup());
+		end2.setGroup(this.getGroup());
+	}
+	
+	@Override
+	public void setGroup(long group) {
+		// TODO Auto-generated method stub
+		super.setGroup(group);
+		end1.setGroup(group);
+		end2.setGroup(group);
 	}
 	
 	public void OnChange(UnitChangeArgs e) {

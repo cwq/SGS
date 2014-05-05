@@ -17,6 +17,8 @@ public class CstTriangleInCircle extends BaseConstraint {
 		CstPointOnCircle.Add(c, t.getPoint1());
 		CstPointOnCircle.Add(c, t.getPoint2());
 		CstPointOnCircle.Add(c, t.getPoint3());
+		
+		ConstraintHandler.union(c.getGroup(), t.getGroup());
 	}
 
 	public static boolean isRelated(SGObject o1, SGObject o2) {

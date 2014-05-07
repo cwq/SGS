@@ -68,7 +68,10 @@ public class SketchUnit extends BaseUnit {
 	@Override
 	public void translate(Point vector, UnitChangeArgs e) {
 		// TODO Auto-generated method stub
-		
+		for(Point pt : pList) {
+			pt.setX(pt.getX() + vector.getX());
+			pt.setY(pt.getY() + vector.getY());
+		}
 	}
 
 	@Override

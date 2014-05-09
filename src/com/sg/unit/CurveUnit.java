@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.graphics.Canvas;
 import android.graphics.Path;
-
 import com.sg.constraint.IChangable;
 import com.sg.constraint.UnitChangeArgs;
 import com.sg.object.Point;
@@ -15,11 +14,24 @@ import com.sg.property.tools.Painter;
 
 public class CurveUnit extends BaseUnit implements IChangable {
 	
-    private double a;          //曲线两个轴长
+	//x^2/a^2+y^2/b^2=1
+    private double a;          //曲线两个 半轴长
     private double b;
     private PointUnit center;
+    
+    /**
+     * 标准方程时 以x轴正方向（a，0）顺时针计算的曲线的起始角度
+     */
     private double startAngle;
-    private double sweepAngle;  //逆时针为正 顺时钟为负
+    
+    /**
+     * 坐标上顺时针为负 逆时钟为正(y轴正方向朝下) 实际上屏幕看到的效果顺时针为正
+     */
+    private double sweepAngle;
+    
+    /**
+     * 以center为中心的旋转，坐标上顺时针为负 逆时钟为正,[-pi..pi]. 实际上屏幕看到的效果顺时针为正
+     */
     private double rotateAngle;
 
     private Point[] ctlPoint;   //贝塞尔曲线控制点
@@ -204,19 +216,21 @@ public class CurveUnit extends BaseUnit implements IChangable {
 			//曲线不闭合
 	        startAngle = CommonFunction.VectorToAngle(pList.get(0), center.toPoint()) - rotateAngle;
 	        sweepAngle = CommonFunction.VectorToAngle(pList.get(pList.size()-1), center.toPoint()) - startAngle - rotateAngle;
-	        
-	        boolean ccw = false;	//是否逆时针排列	
+
+	    	//是否逆时针排列	
+	        boolean ccw = false;
 			Point v1 = new Point(pList.get(0).getX() - center.getX(), pList.get(0).getY() - center.getY());
 			Point v2 = new Point(pList.get(4).getX() - center.getX(), pList.get(4).getY() - center.getY());
-			if(v1.getX()*v2.getY() - v1.getY()*v2.getX() > 0) ccw = true;
+			if((v1.getX()*v2.getY() - v1.getY()*v2.getX()) > 0) ccw = true;
 			
+			//由于屏幕坐标y轴正方向朝下
 			if (ccw) {
-				//如果是逆时针
+				//逆时针
 				if (sweepAngle < 0) {
 					sweepAngle += 2 * Math.PI;
 				}
 			} else {
-				//如果是顺时针
+				//顺时针
 				if (sweepAngle > 0) {
 					sweepAngle -= 2 * Math.PI;
 				}
@@ -326,6 +340,69 @@ public class CurveUnit extends BaseUnit implements IChangable {
 	@Override
 	public boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
+		double x = (point.getX() - center.getX()) * Math.cos(rotateAngle)
+				+ (point.getY() - center.getY()) * Math.sin(rotateAngle);
+		double y = -(point.getX() - center.getX()) * Math.sin(rotateAngle)
+				+ (point.getY() - center.getY()) * Math.cos(rotateAngle);
+		//相对标准方程的坐标  
+		Point p = new Point(x, y);
+		Point p1, p2;
+		//以x坐标获取一个点
+		if (x > a) {
+			p1 = new Point(a, 0);
+		} else if (x < -a) {
+			p1 = new Point(-a, 0);
+		} else {
+			double temp = Math.sqrt((1-x*x/a/a)*b*b);
+			if (y < 0) {
+				temp = -temp;
+			}
+			p1 = new Point(x, temp);
+		}
+		//以y坐标获取一个点
+		if (y > b) {
+			p2 = new Point(0, b);
+		} else if (y < -b) {
+			p2 = new Point(0, -b);
+		} else {
+			double temp = Math.sqrt((1-y*y/b/b)*a*a);
+			if (x < 0) {
+				temp = -temp;
+			}
+			p2 = new Point(temp, y);
+		}
+		
+		//原曲线起始、终止角
+		double start = startAngle;
+		double end = start + sweepAngle;
+		double angleOffset = 0;
+        
+        double angle1 = CommonFunction.VectorToAngle(p1);
+        double angle2 = CommonFunction.VectorToAngle(p2);
+        //如果两点都点在范围外
+        if (sweepAngle > 0) {
+			//逆时针  start - end
+        	if (angle1 < start) angle1 += 2 * Math.PI;
+        	if (angle2 < start) angle2 += 2 * Math.PI;
+			if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))
+					&& !((angle2 > (start - angleOffset)) && (angle2 < (end + angleOffset)))) {
+				return false;
+			}
+		} else {
+			//顺时针  end - start
+			if (angle1 > start) angle1 -= 2 * Math.PI;
+        	if (angle2 > start) angle2 -= 2 * Math.PI;
+			if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))
+					&& !((angle2 > (end - angleOffset)) && (angle2 < (start + angleOffset)))) {
+				return false;
+			}
+		}
+		
+		if (CommonFunction.distance(p1, p) < ThresholdProperty.GRAPH_CHECKED_DISTANCE
+				|| CommonFunction.distance(p2, p) < ThresholdProperty.GRAPH_CHECKED_DISTANCE) {
+			return true;
+		}
+		
 		return false;
 	}
 	

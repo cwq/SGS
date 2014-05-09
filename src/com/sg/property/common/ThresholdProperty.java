@@ -46,6 +46,8 @@ public class ThresholdProperty {
 	
 	public static double CIRCLE_JUDE = 1.5;
 	
+	public static double ANGLE_OFFSET = Math.PI / 10;
+	
 	public static void set(float density, int width) {
 		POINT_COUNT = 20;
 		POINT_DISTANCE = 8 * density;

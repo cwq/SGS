@@ -47,8 +47,10 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback,
 		@Override
 		public boolean onDoubleTapEvent(MotionEvent e) {
 			// TODO Auto-generated method stub
-			Log.v("sc", "onDoubleTap");
-			sc.onDoubleTap(e);
+			if (e.getAction() == MotionEvent.ACTION_UP) {
+				Log.v("sc", "onDoubleTap");
+				sc.onDoubleTap(e);
+			}
 			return true;
 		}
 	}
@@ -112,9 +114,7 @@ public class MainView extends SurfaceView implements SurfaceHolder.Callback,
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		//isFirstUndoDelete = true;
-		boolean handled = mGesture.onTouchEvent(event);
-		Log.v("sc", "mGesture.onTouchEvent:"+handled);
-		if(!handled)
+		if(!mGesture.onTouchEvent(event))
 			sc.collect(event);
 		return true;
 	}

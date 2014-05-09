@@ -38,11 +38,17 @@ public class CommonFunction {
 		return distance;
 	}
 	
+	/**
+	 * 以center为中心逆时针旋转
+	 * @param p
+	 * @param angle
+	 * @param center
+	 * @return 新的旋转后坐标的点
+	 */
     public static Point RotatePoint(Point p, double angle, Point center)
     {
-        angle = -angle;
-        return new Point((float)((p.getX() - center.getX()) * Math.cos(angle) + (p.getY() - center.getY()) * Math.sin(angle) + center.getX()),
-        				 (float)((p.getX() - center.getX()) * -Math.sin(angle) + (p.getY() - center.getY()) * Math.cos(angle) + center.getY()));
+        return new Point((float)((p.getX() - center.getX()) * Math.cos(angle) - (p.getY() - center.getY()) * Math.sin(angle) + center.getX()),
+        				 (float)((p.getX() - center.getX()) * Math.sin(angle) + (p.getY() - center.getY()) * Math.cos(angle) + center.getY()));
     }
 
     public static double VectorToAngle(Point p)

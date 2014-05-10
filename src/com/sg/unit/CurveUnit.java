@@ -78,7 +78,7 @@ public class CurveUnit extends BaseUnit implements IChangable {
 	}
 
     // 更新控制点
-    private void CtlPointUpdate() {
+    private synchronized void CtlPointUpdate() {
         while (this.startAngle > 2 * Math.PI) this.startAngle -= 2 * Math.PI;
         while (this.startAngle < -2 * Math.PI) this.startAngle += 2 * Math.PI;
         while (this.rotateAngle > 2 * Math.PI) this.rotateAngle -= 2 * Math.PI;
@@ -345,8 +345,30 @@ public class CurveUnit extends BaseUnit implements IChangable {
     }
     
 	@Override
-	public boolean isInObject(Point point) {
+	public synchronized boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
+		double start = CommonFunction.VectorToAngle(ctlPoint[0], center.toPoint());
+		double end = CommonFunction.VectorToAngle(ctlPoint[ctlPoint.length-1], center.toPoint());
+		double angleOffset = 0;
+        
+        double angle1 = CommonFunction.VectorToAngle(point, center.toPoint());
+        //如果点在范围外
+        if (sweepAngle > 0) {
+			//逆时针  start - end
+        	if (end < start) end += 2 * Math.PI;
+        	if (angle1 < start) angle1 += 2 * Math.PI;
+        	if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))) {
+				return false;
+			}
+		} else {
+			//顺时针  end - start
+			if (end > start) end -= 2 * Math.PI;
+			if (angle1 > start) angle1 -= 2 * Math.PI;
+        	if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))) {
+				return false;
+			}
+		}
+		
 		double x = (point.getX() - center.getX()) * Math.cos(rotateAngle)
 				+ (point.getY() - center.getY()) * Math.sin(rotateAngle);
 		double y = -(point.getX() - center.getX()) * Math.sin(rotateAngle)
@@ -379,31 +401,31 @@ public class CurveUnit extends BaseUnit implements IChangable {
 			p2 = new Point(temp, y);
 		}
 		
-		//原曲线起始、终止角
-		double start = startAngle;
-		double end = start + sweepAngle;
-		double angleOffset = 0;
-        
-        double angle1 = CommonFunction.VectorToAngle(p1);
-        double angle2 = CommonFunction.VectorToAngle(p2);
-        //如果两点都点在范围外
-        if (sweepAngle > 0) {
-			//逆时针  start - end
-        	if (angle1 < start) angle1 += 2 * Math.PI;
-        	if (angle2 < start) angle2 += 2 * Math.PI;
-			if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))
-					&& !((angle2 > (start - angleOffset)) && (angle2 < (end + angleOffset)))) {
-				return false;
-			}
-		} else {
-			//顺时针  end - start
-			if (angle1 > start) angle1 -= 2 * Math.PI;
-        	if (angle2 > start) angle2 -= 2 * Math.PI;
-			if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))
-					&& !((angle2 > (end - angleOffset)) && (angle2 < (start + angleOffset)))) {
-				return false;
-			}
-		}
+//		//原曲线起始、终止角
+//		double start = startAngle;
+//		double end = start + sweepAngle;
+//		double angleOffset = 0;
+//        
+//        double angle1 = CommonFunction.VectorToAngle(p1);
+//        double angle2 = CommonFunction.VectorToAngle(p2);
+//        //如果两点都点在范围外
+//        if (sweepAngle > 0) {
+//			//逆时针  start - end
+//        	if (angle1 < start) angle1 += 2 * Math.PI;
+//        	if (angle2 < start) angle2 += 2 * Math.PI;
+//			if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))
+//					&& !((angle2 > (start - angleOffset)) && (angle2 < (end + angleOffset)))) {
+//				return false;
+//			}
+//		} else {
+//			//顺时针  end - start
+//			if (angle1 > start) angle1 -= 2 * Math.PI;
+//        	if (angle2 > start) angle2 -= 2 * Math.PI;
+//			if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))
+//					&& !((angle2 > (end - angleOffset)) && (angle2 < (start + angleOffset)))) {
+//				return false;
+//			}
+//		}
 		
 		if (CommonFunction.distance(p1, p) < ThresholdProperty.GRAPH_CHECKED_DISTANCE
 				|| CommonFunction.distance(p2, p) < ThresholdProperty.GRAPH_CHECKED_DISTANCE) {

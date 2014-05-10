@@ -47,6 +47,7 @@ public class CstPointOnCircle extends BaseConstraint {
 				cstMap.get(c).add(pointUnit);
 				cstPreAngle.put(pointUnit, CommonFunction.VectorToAngle(
 						pointUnit.toPoint(), c.getCenter().toPoint()));
+				pointUnit.addUnitListener(CstPointOnCircle.getInstance());
 			}
 		}
 		

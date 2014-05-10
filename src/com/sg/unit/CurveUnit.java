@@ -215,7 +215,7 @@ public class CurveUnit extends BaseUnit implements IChangable {
 			sum += Math.abs(CommonFunction.VectorToAngle(pList.get(i + 1), center.toPoint())
 					- CommonFunction.VectorToAngle(pList.get(i), center.toPoint()));
 		}
-		if (Math.abs(sum) > 3.8 * Math.PI) {
+		if (Math.abs(sum) > 3.9 * Math.PI) {
 			//曲线闭合
 			startAngle = 0;
 			sweepAngle = 2 * Math.PI;
@@ -347,25 +347,35 @@ public class CurveUnit extends BaseUnit implements IChangable {
 	@Override
 	public synchronized boolean isInObject(Point point) {
 		// TODO Auto-generated method stub
-		double start = CommonFunction.VectorToAngle(ctlPoint[0], center.toPoint());
-		double end = CommonFunction.VectorToAngle(ctlPoint[ctlPoint.length-1], center.toPoint());
-		double angleOffset = 0;
-        
-        double angle1 = CommonFunction.VectorToAngle(point, center.toPoint());
-        //如果点在范围外
-        if (sweepAngle > 0) {
-			//逆时针  start - end
-        	if (end < start) end += 2 * Math.PI;
-        	if (angle1 < start) angle1 += 2 * Math.PI;
-        	if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))) {
-				return false;
-			}
-		} else {
-			//顺时针  end - start
-			if (end > start) end -= 2 * Math.PI;
-			if (angle1 > start) angle1 -= 2 * Math.PI;
-        	if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))) {
-				return false;
+		//如果曲线不闭合
+		if (sweepAngle != 2 * Math.PI) {
+			double start = CommonFunction.VectorToAngle(ctlPoint[0],
+					center.toPoint());
+			double end = CommonFunction.VectorToAngle(
+					ctlPoint[ctlPoint.length - 1], center.toPoint());
+			double angleOffset = 0;
+
+			double angle1 = CommonFunction.VectorToAngle(point,
+					center.toPoint());
+			// 如果点在范围外
+			if (sweepAngle > 0) {
+				// 逆时针 start - end
+				if (end < start)
+					end += 2 * Math.PI;
+				if (angle1 < start)
+					angle1 += 2 * Math.PI;
+				if (!((angle1 > (start - angleOffset)) && (angle1 < (end + angleOffset)))) {
+					return false;
+				}
+			} else {
+				// 顺时针 end - start
+				if (end > start)
+					end -= 2 * Math.PI;
+				if (angle1 > start)
+					angle1 -= 2 * Math.PI;
+				if (!((angle1 > (end - angleOffset)) && (angle1 < (start + angleOffset)))) {
+					return false;
+				}
 			}
 		}
 		

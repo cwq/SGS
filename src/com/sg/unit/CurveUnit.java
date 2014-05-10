@@ -14,18 +14,25 @@ import com.sg.property.tools.Painter;
 
 public class CurveUnit extends BaseUnit implements IChangable {
 	
-	//x^2/a^2+y^2/b^2=1
-    private double a;          //曲线两个 半轴长
+	/**
+	 * x^2/a^2+y^2/b^2=1
+	 */
+    private double a;
+    
+    /**
+	 * x^2/a^2+y^2/b^2=1
+	 */
     private double b;
+    
     private PointUnit center;
     
     /**
-     * 标准方程时 以x轴正方向（a，0）顺时针计算的曲线的起始角度
+     * 标准方程时 以x轴正方向（a，0）坐标上逆时针计算的曲线的起始角度
      */
     private double startAngle;
     
     /**
-     * 坐标上顺时针为负 逆时钟为正(y轴正方向朝下) 实际上屏幕看到的效果顺时针为正
+     * 坐标上顺时针为负 逆时钟为正   实际上(y轴正方向朝下)屏幕看到的效果顺时针为正
      */
     private double sweepAngle;
     

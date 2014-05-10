@@ -215,7 +215,7 @@ public class CurveUnit extends BaseUnit implements IChangable {
 			sum += Math.abs(CommonFunction.VectorToAngle(pList.get(i + 1), center.toPoint())
 					- CommonFunction.VectorToAngle(pList.get(i), center.toPoint()));
 		}
-		if (Math.abs(sum) > 3.9 * Math.PI) {
+		if (Math.abs(sum) > 3.85 * Math.PI) {
 			//曲线闭合
 			startAngle = 0;
 			sweepAngle = 2 * Math.PI;

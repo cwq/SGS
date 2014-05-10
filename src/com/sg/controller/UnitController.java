@@ -95,8 +95,17 @@ public class UnitController {
 		return selects.values();
 	}
 	
-	public void addSelect(BaseUnit unit) {
+	public void addOneSelect(BaseUnit unit) {
 		selects.put(unit.getID(), unit);
+	}
+	
+	public void addGroupSelect(BaseUnit unit) {
+		if (unit == null) return;
+		for (BaseUnit u : getUnitSet()) {
+			if (u.getGroup() == unit.getGroup()) {
+				addOneSelect(u);
+			}
+		}
 	}
 	
 	public void setNoSelect() {
@@ -162,7 +171,7 @@ public class UnitController {
 		setNoSelect();
 		BaseUnit baseUnit = selectUnit(p);
 		if (baseUnit != null) {
-			addSelect(baseUnit);
+			addOneSelect(baseUnit);
 			return true;
 		}
 		return false;
@@ -172,11 +181,7 @@ public class UnitController {
 		setNoSelect();
 		BaseUnit baseUnit = selectUnit(p);
 		if (baseUnit != null) {
-			for (BaseUnit unit : getUnitSet()) {
-				if (unit.getGroup() == baseUnit.getGroup()) {
-					addSelect(unit);
-				}
-			}
+			addGroupSelect(baseUnit);
 			return true;
 		}
 		return false;

@@ -17,8 +17,9 @@ public class ConstraintHandler {
 	 */
 	public static void constraintRecognize(Collection<BaseUnit> units) {
 		for (BaseUnit baseUnit : units) {
-			if(constraintRecognize(baseUnit)) {
-				UnitController.getInstance().setNoSelect();
+			if(constraintRecognize(baseUnit) && units.size() > 1) {
+//				UnitController.getInstance().setNoSelect();
+				UnitController.getInstance().addGroupSelect(baseUnit);
 			}
 		}
 	}
@@ -40,6 +41,16 @@ public class ConstraintHandler {
 				}
 				if (graph instanceof CircleGraph) {
 					//识别线和圆
+					
+					//点在圆上
+					if (((CircleGraph) graph).getCurveUnit().isInObject(curLine.getEnd1().toPoint())) {
+						CstPointOnCircle.Add((CircleGraph) graph, curLine.getEnd1());
+						isConstraint = true;
+					}
+					if (((CircleGraph) graph).getCurveUnit().isInObject(curLine.getEnd2().toPoint())) {
+						CstPointOnCircle.Add((CircleGraph) graph, curLine.getEnd2());
+						isConstraint = true;
+					}
 				}
 			}
 			

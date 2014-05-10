@@ -41,10 +41,23 @@ public class CstPointOnCircle extends BaseConstraint {
 		cstPreAngle.put(p, CommonFunction.VectorToAngle(
 				p.toPoint(), c.getCenter().toPoint()));
 		
+		// p原来就与其他点有约束
+		if (CstPointsSamePos.cstMap.get(p) != null) {
+			for (PointUnit pointUnit : CstPointsSamePos.cstMap.get(p)) {
+				cstMap.get(c).add(pointUnit);
+				cstPreAngle.put(pointUnit, CommonFunction.VectorToAngle(
+						pointUnit.toPoint(), c.getCenter().toPoint()));
+			}
+		}
+		
 		c.addUnitListener(CstPointOnCircle.getInstance());
 		p.addUnitListener(CstPointOnCircle.getInstance());
 		
 		ConstraintHandler.union(c.getGroup(), p.getGroup());
+		//添加约束后 马上更新点的位置
+		Point tp = CommonFunction.RotatePoint(new Point(c.getCenter().getX() + c.getRadius(), c.getCenter().getY()),
+				cstPreAngle.get(p), c.getCenter().toPoint());
+		p.Set(tp.getX(), tp.getY());
 	}
 
 	public static boolean isRelated(SGObject o1, SGObject o2) {
